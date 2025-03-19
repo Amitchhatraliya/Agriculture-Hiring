@@ -1,0 +1,61 @@
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .hero-section {
+    flex-direction: column; /* Stack content vertically on smaller screens */
+    text-align: center; /* Center-align text on smaller screens */
+    padding: 20px; /* Reduce padding for smaller screens */
+  }
+
+  .hero-content {
+    max-width: 100%; /* Full width for smaller screens */
+    margin-bottom: 20px;
+  }
+
+  .hero-content h1 {
+    font-size: 2.5rem; /* Slightly smaller font size for mobile */
+  }
+
+  .hero-content p {
+    font-size: 1rem; /* Smaller font size for mobile */
+  }
+
+  .hero-image {
+    max-width: 100%; /* Full width for smaller screens */
+    justify-content: center; /* Center image on smaller screens */
+  }
+
+  .features-grid,
+  .services-grid,
+  .steps-grid,
+  .testimonials-grid {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .feature-card,
+  .service-card,
+  .step-card,
+  .testimonial-card {
+    max-width: 100%;
+    margin-bottom: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-content h1 {
+    font-size: 2rem; /* Even smaller font size for very small screens */
+  }
+
+  .hero-content p {
+    font-size: 0.9rem; /* Smaller font size for very small screens */
+  }
+
+  .features-section h2,
+  .services-section h2,
+  .how-it-works-section h2,
+  .about-section h2,
+  .testimonials-section h2,
+  .contact-section h2 {
+    font-size: 2rem; /* Smaller font size for mobile */
+  }
+}

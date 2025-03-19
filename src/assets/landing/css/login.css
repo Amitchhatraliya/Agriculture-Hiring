@@ -1,0 +1,233 @@
+/* General Styles */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Arial', sans-serif;
+}
+
+.login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-image: url('../../landing/images/login.jpg'); /* Path to your image */
+  background-size: cover; /* Ensures the image covers the entire container */
+  background-position: center; /* Centers the image */
+  background-repeat: no-repeat; /* Prevents the image from repeating */
+}
+
+.login-card {
+  background: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+  padding: 2.5rem;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  width: 400px;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+  .login-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .login-header h1 {
+    font-size: 2rem;
+    color: #000000;
+    margin-bottom: 0.5rem;
+  }
+  
+  .login-header p {
+    color: #000000;
+  }
+  
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #34495e;
+  }
+  
+  .form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+  }
+  
+  .form-control.is-invalid {
+    border-color: #e74c3c;
+  }
+  
+  .invalid-feedback {
+    color: #e74c3c;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
+  
+  .password-group {
+    position: relative;
+  }
+  
+  .password-input {
+    position: relative;
+  }
+  
+  .password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #7f8c8d;
+  }
+  
+  .password-strength {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: #34495e;
+  }
+  
+  .strength-weak {
+    color: #e74c3c;
+  }
+  
+  .strength-medium {
+    color: #f1c40f;
+  }
+  
+  .strength-strong {
+    color: #2ecc71;
+  }
+  
+  .strength-very-strong {
+    color: #27ae60;
+  }
+  
+  .remember-me {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .remember-me label {
+    margin: 0;
+    color: #34495e;
+  }
+  
+  .login-button {
+    width: 100%;
+    padding: 0.75rem;
+    background: #27ae60;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  .login-button:hover {
+    background: #219653;
+  }
+  
+  .login-button:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+  }
+  
+  .spinner {
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #3498db;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .social-login {
+    text-align: center;
+    margin: 1.5rem 0;
+  }
+  
+  .social-login p {
+    color: #7f8c8d;
+    margin-bottom: 1rem;
+  }
+  
+  .social-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+  }
+  
+  .google-button, .facebook-button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  .google-button {
+    background: #db4437;
+    color: white;
+  }
+  
+  .google-button:hover {
+    background: #c23321;
+  }
+  
+  .facebook-button {
+    background: #3b5998;
+    color: white;
+  }
+  
+  .facebook-button:hover {
+    background: #2d4373;
+  }
+  
+  .forgot-password {
+    text-align: center;
+    margin-top: 1rem;
+  }
+  
+  .forgot-password a {
+    color: #3498db;
+    text-decoration: none;
+  }
+  
+  .forgot-password a:hover {
+    text-decoration: underline;
+  }
+  
+  .signup-link {
+    text-align: center;
+    margin-top: 1rem;
+    color: #34495e;
+  }
+  
+  .signup-link a {
+    color: #3498db;
+    text-decoration: none;
+  }
+  
+  .signup-link a:hover {
+    text-decoration: underline;
+  }
+  

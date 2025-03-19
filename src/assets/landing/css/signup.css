@@ -1,0 +1,105 @@
+/* signup.css */
+
+/* General styles */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f9;
+}
+
+/* Signup container */
+.signup-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full viewport height */
+  width: 100vw; /* Full viewport width */
+  background-color: #f4f4f9;
+}
+
+/* Signup card */
+.signup-card {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+/* Signup header */
+.signup-header h1 {
+  font-size: 24px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.signup-header p {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+/* Role selection buttons */
+.role-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.role-button {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  border-radius: 5px;
+  color: white;
+  padding: 15px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.role-button:hover {
+  background-color: #45a049; /* Darker green */
+}
+
+.role-button:active {
+  background-color: #3d8b40; /* Even darker green */
+}
+
+/* Different colors for each role button */
+.role-button[onclick*="Employer"] {
+  background-color: #2196F3; /* Blue for Employer */
+}
+
+.role-button[onclick*="Employer"]:hover {
+  background-color: #1e88e5; /* Darker blue */
+}
+
+.role-button[onclick*="Admin"] {
+  background-color: #f44336; /* Red for Admin */
+}
+
+.role-button[onclick*="Admin"]:hover {
+  background-color: #e53935; /* Darker red */
+}
+
+/* Login link */
+.text-center {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #666;
+}
+
+.text-center a {
+  color: #4CAF50;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.text-center a:hover {
+  text-decoration: underline;
+}

@@ -1,0 +1,275 @@
+/* About Us Page Styles */
+.about-us-page {
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    line-height: 1.6;
+  }
+  
+  .about-hero-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 50px 20px;
+    background-color: #f9f9f9;
+  }
+  
+  .about-hero-content {
+    max-width: 50%;
+  }
+  
+  .about-hero-content h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+  }
+  
+  .about-hero-content p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+  }
+  
+  .about-hero-image img {
+    width: 100%; /* Make image responsive */
+    max-width: 400px; /* Limit maximum width */
+    height: auto; /* Maintain aspect ratio */
+    border-radius: 10px;
+  }
+  
+  .mission-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 50px 20px;
+    background-color: #fff;
+  }
+  
+  .mission-content {
+    max-width: 50%;
+  }
+  
+  .mission-content h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+  
+  .mission-content p {
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+  }
+  
+  .mission-image img {
+    width: 100%; /* Make image responsive */
+    max-width: 400px; /* Limit maximum width */
+    height: 250px; /* Maintain aspect ratio */
+    border-radius: 10px;
+  }
+  
+  .why-choose-us-section {
+    padding: 50px 20px;
+    background-color: #f9f9f9;
+    text-align: center;
+  }
+  
+  .why-choose-us-section h2 {
+    font-size: 2rem;
+    margin-bottom: 40px;
+  }
+  
+  .why-choose-us-grid {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+  }
+  
+  .why-choose-us-card {
+    max-width: 30%;
+    margin-bottom: 20px;
+  }
+  
+  .why-choose-us-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+  
+  .why-choose-us-card p {
+    font-size: 1rem;
+    color: #777;
+  }
+  
+  .team-section {
+    padding: 50px 20px;
+    background-color: #fff;
+    text-align: center;
+  }
+  
+  .team-section h2 {
+    font-size: 2rem;
+    margin-bottom: 40px;
+  }
+  
+  .team-grid {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+  }
+  
+  .team-member {
+    max-width: 30%;
+    margin-bottom: 20px;
+  }
+  
+  .team-member img {
+    width: 150px; /* Fixed width for team member images */
+    height: 150px; /* Fixed height for team member images */
+    object-fit: cover; /* Ensure the image covers the area without distortion */
+    border-radius: 50%;
+    margin-bottom: 15px;
+  }
+  
+  .team-member h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+  
+  .team-member p {
+    font-size: 1rem;
+    color: #777;
+  }
+  
+  .testimonials-section {
+    padding: 50px 20px;
+    background-color: #f9f9f9;
+    text-align: center;
+  }
+  
+  .testimonials-section h2 {
+    font-size: 2rem;
+    margin-bottom: 40px;
+  }
+  
+  .testimonials-grid {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+  }
+  
+  .testimonial-card {
+    max-width: 30%;
+    margin-bottom: 20px;
+  }
+  
+  .testimonial-card img {
+    width: 100px; /* Fixed width for testimonial images */
+    height: 100px; /* Fixed height for testimonial images */
+    object-fit: cover; /* Ensure the image covers the area without distortion */
+    border-radius: 50%;
+    margin-bottom: 15px;
+  }
+  
+  .testimonial-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+  
+  .testimonial-card p {
+    font-size: 1rem;
+    color: #777;
+  }
+  
+  .partners-section {
+    padding: 50px 20px;
+    background-color: #fff;
+    text-align: center;
+  }
+  
+  .partners-section h2 {
+    font-size: 2rem;
+    margin-bottom: 40px;
+  }
+  
+  .partners-grid {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+  }
+  
+  .partner-card {
+    max-width: 30%;
+    margin-bottom: 20px;
+  }
+  
+  .partner-card img {
+    width: 150px; /* Fixed width for partner images */
+    height: 150px; /* Fixed height for partner images */
+    object-fit: cover; /* Ensure the image covers the area without distortion */
+    border-radius: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .partner-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+  
+  .values-section {
+    padding: 50px 20px;
+    background-color: #fff;
+    text-align: center;
+  }
+  
+  .values-section h2 {
+    font-size: 2rem;
+    margin-bottom: 40px;
+  }
+  
+  .values-grid {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+  }
+  
+  .value-card {
+    max-width: 30%;
+    margin-bottom: 20px;
+  }
+  
+  .value-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+  
+  .value-card p {
+    font-size: 1rem;
+    color: #777;
+  }
+  
+  .footer-section {
+    text-align: center;
+    padding: 20px;
+    background-color: #333;
+    color: #fff;
+  }
+  
+  .footer-section p {
+    margin: 0;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .about-hero-section, .mission-section, .why-choose-us-section, .team-section, .testimonials-section, .partners-section, .values-section {
+      flex-direction: column;
+      text-align: center;
+    }
+  
+    .about-hero-content, .mission-content, .why-choose-us-card, .team-member, .testimonial-card, .partner-card, .value-card {
+      max-width: 100%;
+      margin-bottom: 20px;
+    }
+  
+    .about-hero-image img, .mission-image img, .testimonial-card img, .partner-card img {
+      max-width: 100%; /* Full width on smaller screens */
+    }
+  
+    .team-grid, .testimonials-grid, .partners-grid, .values-grid {
+      flex-direction: column;
+    }
+  }
