@@ -36,9 +36,9 @@ export const Signup = () => {
           <button className="role-button" onClick={() => handleRoleSelection('Worker')}>
             Worker
           </button>
-          <button className="role-button" onClick={() => handleRoleSelection('Admin')}>
+          {/* <button className="role-button" onClick={() => handleRoleSelection('Admin')}>
             Admin
-          </button>
+          </button> */}
         </div>
         <p className="text-center mt-2">
           Already have an account? <Link to="/login">Login</Link>

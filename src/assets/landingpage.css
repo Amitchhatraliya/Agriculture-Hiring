@@ -3,95 +3,132 @@
   font-family: 'Arial', sans-serif;
   color: #333;
   line-height: 1.6;
+  background-color: #f9f9f9;
 }
 
 /* Hero Section */
 .hero-section {
   display: flex;
-  align-items: flex-start; /* Align items to the top */
+  align-items: center;
   justify-content: space-between;
-  padding: 50px;
-  background-color: #f4f4f4;
-  gap: 20px; /* Add gap between text and image */
+  padding: 100px 50px;
+  background: linear-gradient(135deg, #006217, #218838);
+  color: #fff;
+  gap: 0px;
 }
 
 .hero-content {
-  flex: 1; /* Allow content to grow and take available space */
-  max-width: 50%; /* Limit content width */
-  text-align: left; /* Ensure text is left-aligned */
+  flex: 1;
+  max-width: 50%;
+  text-align: left;
 }
 
 .hero-content h1 {
-  font-size: 3rem;
+  font-size: 3.5rem;
   margin-bottom: 20px;
-  line-height: 1.2; /* Improve line spacing */
+  line-height: 1.2;
+  animation: fadeIn 1.5s ease-in-out;
 }
 
 .hero-content p {
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   margin-bottom: 30px;
-  color: #ffffff; /* Slightly darker text for better readability */
+  animation: fadeIn 2s ease-in-out;
 }
 
 .auth-buttons {
   display: flex;
-  gap: 10px; /* Add gap between buttons */
+  gap: 15px;
 }
 
 .cta-button {
-  padding: 10px 20px;
-  background-color: #006217;
-  color: #fff;
+  padding: 12px 24px;
+  background-color: #fff;
+  color: #006217;
   border: none;
-  border-radius: 5px;
+  border-radius: 25px;
   cursor: pointer;
   font-size: 1rem;
-  transition: background-color 0.3s ease; /* Add hover effect */
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .cta-button:hover {
-  background-color: #218838; /* Darker green on hover */
+  background-color: #f0f0f0;
+  transform: translateY(-5px);
 }
 
 .hero-image {
-  flex: 1; /* Allow image to grow and take available space */
-  max-width: 45%; /* Limit image width */
+  flex: 1;
+  max-width: 45%;
   display: flex;
-  align-items: flex-start; /* Align image to the top */
-  justify-content: flex-end; /* Push image to the right */
+  justify-content: flex-end;
 }
 
 .hero-image img {
   max-width: 80%;
   border-radius: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  /* animation: float 3s ease-in-out infinite; */
+}
+
+/* Keyframes for Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 /* Features Section */
 .features-section {
-  padding: 50px;
+  padding: 50px 50px;
   text-align: center;
+  background-color: #fff;
 }
 
 .features-section h2 {
   font-size: 2.5rem;
   margin-bottom: 40px;
+  animation: fadeIn 1.5s ease-in-out;
 }
 
 .features-grid {
   display: flex;
   justify-content: space-around;
+  gap: 20px;
 }
 
 .feature-card {
-  max-width: 30%;
-  text-align: center; /* Center-align text */
+  background-color: #d6d4d4;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
 .feature-card img {
-  width: 100%; /* Ensure all images take full width of their container */
-  height: 200px; /* Set a fixed height for all images */
-  object-fit: cover; /* Ensure the image covers the area without distortion */
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
   border-radius: 10px;
 }
 
@@ -106,27 +143,34 @@
 
 /* Services Section */
 .services-section {
-  padding: 50px;
+  padding: 80px 50px;
   text-align: center;
-  background-color: #fff;
+  background-color: #f9f9f9;
 }
 
 .services-section h2 {
   font-size: 2.5rem;
   margin-bottom: 40px;
+  animation: fadeIn 1.5s ease-in-out;
 }
 
 .services-grid {
   display: flex;
   justify-content: space-around;
+  gap: 20px;
 }
 
 .service-card {
-  max-width: 30%;
+  background-color: #d6d4d4;
   padding: 20px;
-  background-color: #ccc9c9;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.service-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
 .service-card h3 {
@@ -140,7 +184,7 @@
 
 /* How It Works Section */
 .how-it-works-section {
-  padding: 50px;
+  padding: 80px 50px;
   text-align: center;
   background-color: #fff;
 }
@@ -148,19 +192,26 @@
 .how-it-works-section h2 {
   font-size: 2.5rem;
   margin-bottom: 40px;
+  animation: fadeIn 1.5s ease-in-out;
 }
 
 .steps-grid {
   display: flex;
   justify-content: space-around;
+  gap: 20px;
 }
 
 .step-card {
-  max-width: 30%;
+  background-color: #d6d4d4;
   padding: 20px;
-  background-color: #ccc9c9;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.step-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
 .step-card h3 {
@@ -174,14 +225,15 @@
 
 /* About Section */
 .about-section {
-  padding: 50px;
+  padding: 80px 50px;
   text-align: center;
-  background-color: #fff;
+  background-color: #f9f9f9;
 }
 
 .about-section h2 {
   font-size: 2.5rem;
   margin-bottom: 20px;
+  animation: fadeIn 1.5s ease-in-out;
 }
 
 .about-section p {
@@ -191,27 +243,34 @@
 
 /* Testimonials Section */
 .testimonials-section {
-  padding: 50px;
+  padding: 80px 50px;
   text-align: center;
-  background-color: #f4f4f4;
+  background-color: #fff;
 }
 
 .testimonials-section h2 {
   font-size: 2.5rem;
   margin-bottom: 40px;
+  animation: fadeIn 1.5s ease-in-out;
 }
 
 .testimonials-grid {
   display: flex;
   justify-content: space-around;
+  gap: 20px;
 }
 
 .testimonial-card {
-  max-width: 45%;
+  background-color: #d6d4d4;
   padding: 20px;
-  background-color: #fff;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.testimonial-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
 .testimonial-card img {
@@ -230,14 +289,15 @@
 
 /* Contact Us Section */
 .contact-section {
-  padding: 50px;
+  padding: 80px 50px;
   text-align: center;
-  background-color: #fff;
+  background-color: #f9f9f9;
 }
 
 .contact-section h2 {
   font-size: 2.5rem;
   margin-bottom: 40px;
+  animation: fadeIn 1.5s ease-in-out;
 }
 
 .contact-form {

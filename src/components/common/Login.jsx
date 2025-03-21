@@ -9,6 +9,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'; // Corrected import
 import { faGoogle, faFacebook } from '@fortawesome/free-brands-svg-icons'; // Corrected import
 import '../../assets/landing/css/login.css';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+// import Login from './path/to/Login';
+
 export const Login = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const navigate = useNavigate();
@@ -176,4 +179,4 @@ export const Login = () => {
       </div>
     </div>
   );
-};
+};   

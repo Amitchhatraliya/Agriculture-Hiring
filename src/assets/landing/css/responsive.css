@@ -1,27 +1,26 @@
-/* Responsive Styles */
 @media (max-width: 768px) {
   .hero-section {
-    flex-direction: column; /* Stack content vertically on smaller screens */
-    text-align: center; /* Center-align text on smaller screens */
-    padding: 20px; /* Reduce padding for smaller screens */
+    flex-direction: column;
+    text-align: center;
+    padding: 50px 20px;
   }
 
   .hero-content {
-    max-width: 100%; /* Full width for smaller screens */
+    max-width: 100%;
     margin-bottom: 20px;
   }
 
   .hero-content h1 {
-    font-size: 2.5rem; /* Slightly smaller font size for mobile */
+    font-size: 2.5rem;
   }
 
   .hero-content p {
-    font-size: 1rem; /* Smaller font size for mobile */
+    font-size: 1.2rem;
   }
 
   .hero-image {
-    max-width: 100%; /* Full width for smaller screens */
-    justify-content: center; /* Center image on smaller screens */
+    max-width: 100%;
+    justify-content: center;
   }
 
   .features-grid,
@@ -30,6 +29,7 @@
   .testimonials-grid {
     flex-direction: column;
     align-items: center;
+    gap: 20px;
   }
 
   .feature-card,
@@ -43,11 +43,11 @@
 
 @media (max-width: 480px) {
   .hero-content h1 {
-    font-size: 2rem; /* Even smaller font size for very small screens */
+    font-size: 2rem;
   }
 
   .hero-content p {
-    font-size: 0.9rem; /* Smaller font size for very small screens */
+    font-size: 1rem;
   }
 
   .features-section h2,
@@ -56,6 +56,6 @@
   .about-section h2,
   .testimonials-section h2,
   .contact-section h2 {
-    font-size: 2rem; /* Smaller font size for mobile */
+    font-size: 2rem;
   }
 }

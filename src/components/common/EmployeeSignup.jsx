@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Bounce, toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import '../../assets/landing/css/signup.css'; // Create a CSS file for custom styles
+import '../../assets/landing/css/signup.css';
 
 export const EmployeeSignup = () => {
   const { register, handleSubmit, formState: { errors }, watch } = useForm();
@@ -15,7 +15,7 @@ export const EmployeeSignup = () => {
     console.log(data);
     data.roleId = "67c65ead46b8bd9b25fcbd03"; // Replace with the actual role ID for employees
     try {
-      const res = await axios.post("/user/employeesignup", data); // Adjust the API endpoint for employee signup
+      const res = await axios.post("/user/employeesignup", data);
       if (res.status === 201) {
         toast.success('️✅ Successfully Signed up as Employee!', {
           position: "top-center",
@@ -28,7 +28,7 @@ export const EmployeeSignup = () => {
           theme: "light",
           transition: Bounce,
         });
-        navigate("/login"); // Redirect to employee login page
+        navigate("/login");
       }
     } catch (error) {
       toast.error('❌ Error signing up. Please try again.', {
