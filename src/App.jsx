@@ -25,6 +25,7 @@ import { ContactUs } from './components/common/ContactUs'
 import AboutUs from './components/common/AboutUs'
 import EmployerDashboard from './components/common/EmployerDashboard'
 import  WorkerDashboard  from './components/common/WorkerDashboard'
+import AdminDashboard from './components/common/AdminDashboard'
 
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
        <Routes>
         <Route path='/'element={<LandingPage/>}></Route>
         <Route path='/contact'element={<ContactUs/>}></Route> 
+        <Route path='/admindashboard'element={<AdminDashboard/>}></Route>
         <Route path='/employerdashboard'element={<EmployerDashboard/>}></Route>
         <Route path='/workerdashboard'element={<WorkerDashboard/>}></Route>
         <Route path='/about-us'element={<AboutUs/>}></Route> 

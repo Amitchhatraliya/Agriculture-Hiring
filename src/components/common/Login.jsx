@@ -40,9 +40,12 @@ export const Login = () => {
         localStorage.setItem("role", res.data.data.roleId.name);
         if (res.data.data.roleId.name === "ADMIN") {
           navigate("/adminprofile");
+        } else if (res.data.data.roleId.name === "WORKER") {
+          navigate("/workerdashboard"); // Redirect to Worker profile if role is WORKER
         } else {
-          navigate("/userprofile"); // Redirect to user profile if not admin
+          navigate("/employerdashboard"); // Redirect to a default page if the role is not recognized
         }
+
       }
     } catch (error) {
       toast.error('❌ Invalid email or password', {
