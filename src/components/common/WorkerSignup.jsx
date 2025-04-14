@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Bounce, toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import '../../assets/landing/css/workersignup.css'; // Create a CSS file for custom styles
+import '../../assets/landing/css/workersignup.css';
 
 export const WorkerSignup = () => {
   const { register, handleSubmit, formState: { errors }, watch } = useForm();
@@ -13,9 +13,17 @@ export const WorkerSignup = () => {
 
   const submitHandler = async (data) => {
     console.log(data);
-    data.roleId = "67c660b3b22e1fed7fbf5b7e"; // Replace with the actual role ID for workers
+    const workerData = {
+      fullName: data.fullname,
+      email: data.email,
+      password: data.password,
+      location: data.location,
+      availability: data.availability,
+      roleId: "67c660b3b22e1fed7fbf5b7e" // Your role ID for workers
+    };
+
     try {
-      const res = await axios.post("/user/workersignup", data); // Adjust the API endpoint for worker signup
+      const res = await axios.post("http://localhost:8000/worker/addworker", workerData); // Update with your backend URL
       if (res.status === 201) {
         toast.success('️✅ Successfully Signed up as Worker!', {
           position: "top-center",
@@ -28,10 +36,11 @@ export const WorkerSignup = () => {
           theme: "light",
           transition: Bounce,
         });
-        navigate("/login"); // Redirect to worker login page
+        navigate("/login");
       }
     } catch (error) {
-      toast.error('❌ Error signing up. Please try again.', {
+      console.error('Error:', error.response?.data || error.message);
+      toast.error(error.response?.data?.message || '❌ Error signing up. Please try again.', {
         position: "top-center",
         autoClose: 2000,
         hideProgressBar: false,
@@ -45,6 +54,7 @@ export const WorkerSignup = () => {
     }
   };
 
+  // ... rest of your component code remains the same ...
   const checkPasswordStrength = (password) => {
     const strength = {
       0: "Weak",
@@ -111,33 +121,6 @@ export const WorkerSignup = () => {
           </div>
 
           <div className="form-group">
-            <label>Job Type</label>
-            <select
-              className={`form-control ${errors.jobType ? 'is-invalid' : ''}`}
-              {...register("jobType", { required: "Job type is required" })}
-            >
-              <option value="">Select Job Type</option>
-              <option value="Harvesting">Harvesting</option>
-              <option value="Planting">Planting</option>
-              <option value="Irrigation">Irrigation</option>
-              <option value="Pruning">Pruning</option>
-              <option value="Other">Other</option>
-            </select>
-            {errors.jobType && <div className="invalid-feedback">{errors.jobType.message}</div>}
-          </div>
-
-          <div className="form-group">
-            <label>Experience</label>
-            <input
-              type="text"
-              className={`form-control ${errors.experience ? 'is-invalid' : ''}`}
-              placeholder="Enter your experience (e.g., 2 years)"
-              {...register("experience", { required: "Experience is required" })}
-            />
-            {errors.experience && <div className="invalid-feedback">{errors.experience.message}</div>}
-          </div>
-
-          <div className="form-group">
             <label>Location</label>
             <input
               type="text"
@@ -160,17 +143,6 @@ export const WorkerSignup = () => {
               <option value="Seasonal">Seasonal</option>
             </select>
             {errors.availability && <div className="invalid-feedback">{errors.availability.message}</div>}
-          </div>
-
-          <div className="form-group">
-            <label>Skills</label>
-            <input
-              type="text"
-              className={`form-control ${errors.skills ? 'is-invalid' : ''}`}
-              placeholder="Enter your skills (e.g., tractor driving, planting)"
-              {...register("skills", { required: "Skills are required" })}
-            />
-            {errors.skills && <div className="invalid-feedback">{errors.skills.message}</div>}
           </div>
 
           <div className="form-group">

@@ -13,11 +13,18 @@ export const EmployeeSignup = () => {
 
   const submitHandler = async (data) => {
     console.log(data);
-    data.roleId = "67c65ead46b8bd9b25fcbd03"; // Replace with the actual role ID for employees
     try {
-      const res = await axios.post("/user/employeesignup", data);
+      const res = await axios.post("/employer/addemployer", {
+        fullName: data.fullname,
+        email: data.email,
+        companyName: data.companyName,
+        location: data.location,
+        password: data.password,
+        roleId: "67c65ead46b8bd9b25fcbd03" // Replace with actual employer role ID
+      });
+      
       if (res.status === 201) {
-        toast.success('️✅ Successfully Signed up as Employee!', {
+        toast.success('️✅ Successfully Signed up as Employer!', {
           position: "top-center",
           autoClose: 900,
           hideProgressBar: false,
@@ -28,10 +35,11 @@ export const EmployeeSignup = () => {
           theme: "light",
           transition: Bounce,
         });
-        navigate("/login");
+        navigate("/login1");
       }
     } catch (error) {
-      toast.error('❌ Error signing up. Please try again.', {
+      console.error("Signup error:", error);
+      toast.error(error.response?.data?.message || '❌ Error signing up. Please try again.', {
         position: "top-center",
         autoClose: 2000,
         hideProgressBar: false,
@@ -79,7 +87,7 @@ export const EmployeeSignup = () => {
         />
         <div className="signup-header">
           <h1>Join Agriculture Hiring</h1>
-          <p>Sign up as an employee and find your next job!</p>
+          <p>Sign up as an employer and find great talent!</p>
         </div>
         <form onSubmit={handleSubmit(submitHandler)}>
           <div className="form-group">
@@ -111,30 +119,14 @@ export const EmployeeSignup = () => {
           </div>
 
           <div className="form-group">
-            <label>Job Role</label>
-            <select
-              className={`form-control ${errors.jobRole ? 'is-invalid' : ''}`}
-              {...register("jobRole", { required: "Job role is required" })}
-            >
-              <option value="">Select Job Role</option>
-              <option value="Farm Manager">Farm Manager</option>
-              <option value="Agriculture Technician">Agriculture Technician</option>
-              <option value="Sales Representative">Sales Representative</option>
-              <option value="Food Processing Technician">Food Processing Technician</option>
-              <option value="Other">Other</option>
-            </select>
-            {errors.jobRole && <div className="invalid-feedback">{errors.jobRole.message}</div>}
-          </div>
-
-          <div className="form-group">
-            <label>Experience</label>
+            <label>Company Name</label>
             <input
               type="text"
-              className={`form-control ${errors.experience ? 'is-invalid' : ''}`}
-              placeholder="Enter your experience"
-              {...register("experience", { required: "Experience is required" })}
+              className={`form-control ${errors.companyName ? 'is-invalid' : ''}`}
+              placeholder="Enter your company name"
+              {...register("companyName", { required: "Company name is required" })}
             />
-            {errors.experience && <div className="invalid-feedback">{errors.experience.message}</div>}
+            {errors.companyName && <div className="invalid-feedback">{errors.companyName.message}</div>}
           </div>
 
           <div className="form-group">
@@ -146,17 +138,6 @@ export const EmployeeSignup = () => {
               {...register("location", { required: "Location is required" })}
             />
             {errors.location && <div className="invalid-feedback">{errors.location.message}</div>}
-          </div>
-
-          <div className="form-group">
-            <label>Skills</label>
-            <input
-              type="text"
-              className={`form-control ${errors.skills ? 'is-invalid' : ''}`}
-              placeholder="Enter your skills"
-              {...register("skills", { required: "Skills are required" })}
-            />
-            {errors.skills && <div className="invalid-feedback">{errors.skills.message}</div>}
           </div>
 
           <div className="form-group">
@@ -200,7 +181,7 @@ export const EmployeeSignup = () => {
           </div>
 
           <button type="submit" className="signup-button">
-            Signup as Employee
+            Signup as Employer
           </button>
         </form>
         <p className="text-center mt-2">

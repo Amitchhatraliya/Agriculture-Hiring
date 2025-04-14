@@ -6,11 +6,9 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Bounce } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'; // Corrected import
-import { faGoogle, faFacebook } from '@fortawesome/free-brands-svg-icons'; // Corrected import
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { faGoogle, faFacebook } from '@fortawesome/free-brands-svg-icons';
 import '../../assets/landing/css/login.css';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-// import Login from './path/to/Login';
 
 export const Login = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -21,11 +19,14 @@ export const Login = () => {
 
   const submitHandler = async (data) => {
     setIsLoading(true);
-    data.roleId = "67be7d4cc39763bc811c28ae";
     try {
-      const res = await axios.post("/user/login", data);
-      if (res.status === 200) {
-        toast.success('✅ Logged in Successfully', {
+      const res = await axios.post("/worker/loginworker", data);
+
+      if (res.status === 200 && res.data?.data?.roleId?.name) {
+        const user = res.data.data;
+        const role = user.roleId.name.toUpperCase();
+
+        toast.success(`✅ Logged in Successfully as ${role}`, {
           position: "top-center",
           autoClose: 900,
           hideProgressBar: false,
@@ -36,16 +37,21 @@ export const Login = () => {
           theme: "colored",
           transition: Bounce,
         });
-        localStorage.setItem("id", res.data.data._id);
-        localStorage.setItem("role", res.data.data.roleId.name);
-        if (res.data.data.roleId.name === "ADMIN") {
-          navigate("/adminprofile");
-        } else if (res.data.data.roleId.name === "WORKER") {
-          navigate("/workerdashboard"); // Redirect to Worker profile if role is WORKER
-        } else {
-          navigate("/employerdashboard"); // Redirect to a default page if the role is not recognized
-        }
 
+        localStorage.setItem("id", user._id);
+        localStorage.setItem("roles", role);
+
+        setTimeout(() => {
+          if (role === "WORKER") {
+            navigate("/workerdashboard");
+          } else if (role === "EMPLOYEE") {
+            navigate("/employerdashboard");
+          } else {
+            navigate("/"); // fallback
+          }
+        }, 1000);
+
+        return;
       }
     } catch (error) {
       toast.error('❌ Invalid email or password', {
@@ -83,19 +89,7 @@ export const Login = () => {
   return (
     <div className="login-container">
       <div className="login-card">
-        <ToastContainer
-          position="top-center"
-          autoClose={900}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick={false}
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="colored"
-          transition={Bounce}
-        />
+        <ToastContainer />
         <div className="login-header">
           <h1>Welcome Back!</h1>
           <p><strong>Login to your Agriculture Hiring account</strong></p>
@@ -182,4 +176,4 @@ export const Login = () => {
       </div>
     </div>
   );
-};   
+};
