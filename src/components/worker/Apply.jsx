@@ -37,7 +37,7 @@ export const Apply = () => {
     data.append('coverletter', formData.coverLetter); // name must match backend expectation
 
     try {
-      const response = await fetch('http://localhost:8000/jobapplication/addjobapplicationwithfile', {
+      const response = await fetch('http://localhost:4000/jobapplication/addjobapplicationwithfile', {
         method: 'POST',
         body: data
       });

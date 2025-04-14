@@ -14,7 +14,7 @@ const JobSeekerDashboard = () => {
     const fetchJobs = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch('http://localhost:8000/job/getjob');
+        const response = await fetch('http://localhost:4000/job/getjob');
         if (!response.ok) {
           throw new Error('Failed to fetch jobs');
         }
@@ -42,14 +42,14 @@ const JobSeekerDashboard = () => {
       const fetchApplications = async () => {
         setIsLoading(true);
         try {
-          const response = await fetch('http://localhost:8000/jobapplication/getalljobapplicationwithfile');
+          const response = await fetch('http://localhost:4000/jobapplication/getalljobapplicationwithfile');
           if (!response.ok) {
             throw new Error('Failed to fetch applications');
           }
           const data = await response.json();
           if (data.message === "All job applications with files retrieved successfully" && data.data) {
             // First fetch all jobs to have complete job data
-            const jobsResponse = await fetch('http://localhost:8000/job/getjob');
+            const jobsResponse = await fetch('http://localhost:4000/job/getjob');
             const jobsData = await jobsResponse.json();
             const allJobs = jobsData.message === "Job found" ? jobsData.data : [];
             

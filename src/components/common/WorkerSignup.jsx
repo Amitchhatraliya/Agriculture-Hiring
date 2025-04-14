@@ -23,7 +23,7 @@ export const WorkerSignup = () => {
     };
 
     try {
-      const res = await axios.post("http://localhost:8000/worker/addworker", workerData); // Update with your backend URL
+      const res = await axios.post("http://localhost:4000/worker/addworker", workerData); // Update with your backend URL
       if (res.status === 201) {
         toast.success('️✅ Successfully Signed up as Worker!', {
           position: "top-center",

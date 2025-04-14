@@ -61,7 +61,7 @@ const JobProviderDashboard = () => {
         employmentType: newJob.employmentType || 'Full-Time'
       };
   
-      const response = await axios.post('http://localhost:8000/job/addjob', jobToPost, {
+      const response = await axios.post('http://localhost:4000/job/addjob', jobToPost, {
         validateStatus: function (status) {
           return status < 500;
         }
