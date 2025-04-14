@@ -1,0 +1,37 @@
+const express=require("express")
+const app=express()
+
+// app.get("/test",(req,res)=>{
+
+//     console.log("test api called...")
+
+//     res.send("Hello test api called...")
+
+// })
+
+// app.get("/users",(req,res)=>{
+//     res.json({
+//         message:"user api called...",
+//         data:["ram","shyam","seeta"]
+//     })
+    
+// })
+
+// app.get("/employees",(req,res)=>{
+//     res.json([
+//         {
+//             name:"prapti",
+//             salary:"100000000",
+//             employeeid:"24",
+//         },
+//         {
+//             name:"amit",
+//             salary:"200000000",
+//             employeeid:"25",
+//         }
+//     ])
+// })
+const PORT=4000
+app.listen(PORT,()=>{
+    console.log("server started on port number",PORT)
+})
