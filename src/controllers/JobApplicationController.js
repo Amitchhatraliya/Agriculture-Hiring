@@ -63,29 +63,52 @@ const addJobApplication = async (req, res) => {
 
 const addJobApplicationWithFile = async (req, res) => {
   upload(req, res, async (err) => {
-      if (err) {
-          return res.status(500).json({ message: err.message });
+    if (err) {
+      return res.status(500).json({ message: 'Upload error', error: err.message });
+    }
+
+    try {
+      console.log('FILES:', req.files);
+      console.log('BODY:', req.body);
+
+      const { firstName, lastName, workerId, jobId } = req.body;
+
+      if (!firstName || !lastName || !workerId || !jobId) {
+        return res.status(400).json({ message: 'Missing required fields' });
       }
 
-      try {
-          console.log(req.files); // check the file object structure
-          const resumeUpload = await cloudinaryUtil.uploadFileToCloudinary(req.files.resume[0]);
-          const coverletterUpload = await cloudinaryUtil.uploadFileToCloudinary(req.files.coverletter[0]);
-
-          req.body.resume = resumeUpload.secure_url;
-          req.body.coverletter = coverletterUpload.secure_url;
-
-          const jobapplication = await jobApplicationModel.create(req.body);
-
-          res.status(200).json({
-              message: "Job Application file saved successfully",
-              data: jobapplication,
-          });
-      } catch (uploadError) {
-          res.status(500).json({ message: uploadError.message });
+      if (!req.files?.resume || !req.files?.coverletter) {
+        return res.status(400).json({ message: 'Missing resume or cover letter files' });
       }
+
+      const resumeUpload = await cloudinaryUtil.uploadFileToCloudinary(req.files.resume[0]);
+      const coverletterUpload = await cloudinaryUtil.uploadFileToCloudinary(req.files.coverletter[0]);
+
+      const jobapplication = await jobApplicationModel.create({
+        firstName,
+        lastName,
+        resume: resumeUpload.secure_url,
+        coverletter: coverletterUpload.secure_url,
+        workerId,
+        jobId,
+      });
+
+      console.log('Created application:', jobapplication);
+
+      res.status(201).json({
+        message: 'Job Application with file saved successfully',
+        data: jobapplication,
+      });
+      console.log('Received resume file:', req.files?.resume?.[0]);
+      console.log('Received coverletter file:', req.files?.coverletter?.[0]);
+
+    } catch (uploadError) {
+      console.error('Error saving application:', uploadError);
+      res.status(500).json({ message: 'Server error', error: uploadError.message });
+    }
   });
 };
+
 
 const getAllJobApplicationWithFile = async (req, res) => {
   try {

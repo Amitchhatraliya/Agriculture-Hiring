@@ -2,14 +2,14 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const jobApplicationSchema = new Schema({
-    // jobId:{
-    //     type: Schema.Types.ObjectId,
-    //     ref: "Job",
-    // },
-    // userId:{
-    //     type: Schema.Types.ObjectId,
-    //     ref: "users",
-    // },
+    jobId:{
+        type: Schema.Types.ObjectId,
+        ref: "Job",
+    },
+    workerId:{
+        type: Schema.Types.ObjectId,
+        ref: "Worker",
+    },
     firstName:{
         type: String,
         required: true,
@@ -20,11 +20,11 @@ const jobApplicationSchema = new Schema({
     },
     resume:{
         type: String,
-        required: true,
+        // required: true,
     },
     coverletter:{
         type: String,
-        required: true,
+        // required: true,
     },
     // status:{
     //     type: String,
