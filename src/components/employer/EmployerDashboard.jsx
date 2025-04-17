@@ -7,6 +7,7 @@ const JobProviderDashboard = () => {
   const [applicants, setApplicants] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [selectedJobId, setSelectedJobId] = useState(null);
   const [newJob, setNewJob] = useState({
     companyName: '',
     title: '',
@@ -18,7 +19,7 @@ const JobProviderDashboard = () => {
   });
 
   useEffect(() => {
-    if (activeTab === 'viewJobs') {
+    if (activeTab === 'dashboard' || activeTab === 'viewJobs') {
       fetchJobs();
     }
   }, [activeTab]);
@@ -27,11 +28,41 @@ const JobProviderDashboard = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await axios.get('/job/getjob');
-      setJobs(response.data.data);
+      const response = await axios.get('http://localhost:4000/job/getjob');
+      // Ensure applicationCount is properly set from either applicationCount field or applications array length
+      const jobsWithCounts = response.data.data.map(job => ({
+        ...job,
+        applicationCount: job.applications ? job.applications.length : job.applicationCount || 0
+      }));
+      setJobs(jobsWithCounts);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch jobs');
       console.error('Error fetching jobs:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchApplicants = async (jobId) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await axios.get(`http://localhost:4000/jobapplication/job/${jobId}`);
+      setApplicants(response.data || []);
+      setSelectedJobId(jobId);
+      setActiveTab('viewApplicants');
+      
+      // Update the specific job's application count in the jobs state
+      setJobs(prevJobs => 
+        prevJobs.map(job => 
+          job._id === jobId 
+            ? { ...job, applicationCount: response.data.length } 
+            : job
+        )
+      );
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch applicants');
+      console.error('Error fetching applicants:', err);
     } finally {
       setIsLoading(false);
     }
@@ -55,23 +86,9 @@ const JobProviderDashboard = () => {
         throw new Error('Please fill all required fields');
       }
   
-      const jobToPost = {
-        ...newJob,
-        status: newJob.status || 'Active',
-        employmentType: newJob.employmentType || 'Full-Time'
-      };
+      const response = await axios.post('http://localhost:4000/job/addjob', newJob);
   
-      const response = await axios.post('http://localhost:4000/job/addjob', jobToPost, {
-        validateStatus: function (status) {
-          return status < 500;
-        }
-      });
-  
-      if (response.status >= 400) {
-        throw new Error(response.data.message || 'Failed to add job');
-      }
-  
-      setJobs([...jobs, response.data.data]);
+      setJobs(prevJobs => [...prevJobs, { ...response.data.data, applicationCount: 0 }]);
       setNewJob({
         companyName: '',
         title: '',
@@ -90,13 +107,18 @@ const JobProviderDashboard = () => {
     }
   };
 
-  const viewApplicants = (jobId) => {
-    const mockApplicants = [
-      { id: 1, name: 'John Doe', email: 'john@example.com', jobId, status: 'Pending' },
-      { id: 2, name: 'Jane Smith', email: 'jane@example.com', jobId, status: 'Reviewed' }
-    ];
-    setApplicants(mockApplicants);
-    setActiveTab('viewApplicants');
+  const updateApplicationStatus = async (applicationId, newStatus) => {
+    try {
+      await axios.patch(`http://localhost:4000/jobapplication/${applicationId}`, {
+        status: newStatus
+      });
+      
+      if (selectedJobId) {
+        fetchApplicants(selectedJobId);
+      }
+    } catch (error) {
+      console.error("Error updating application status:", error);
+    }
   };
 
   const renderTabContent = () => {
@@ -112,7 +134,9 @@ const JobProviderDashboard = () => {
               </div>
               <div style={styles.statCard}>
                 <h3>Total Applicants</h3>
-                <p style={styles.statNumber}>{applicants.length}</p>
+                <p style={styles.statNumber}>
+                  {jobs.reduce((total, job) => total + (job.applicationCount || 0), 0)}
+                </p>
               </div>
               <div style={styles.statCard}>
                 <h3>Active Listings</h3>
@@ -218,10 +242,10 @@ const JobProviderDashboard = () => {
                     style={styles.input}
                     required
                   >
-                    <option value="Seasonal">Seasonal</option>
-                    <option value="Contract">Contract</option>
                     <option value="Full-Time">Full-Time</option>
                     <option value="Part-Time">Part-Time</option>
+                    <option value="Contract">Contract</option>
+                    <option value="Seasonal">Seasonal</option>
                   </select>
                 </div>
               </div>
@@ -249,7 +273,7 @@ const JobProviderDashboard = () => {
             ) : (
               <div style={styles.jobList}>
                 {jobs.map(job => (
-                  <div key={job._id || job.id} style={styles.jobCard}>
+                  <div key={job._id} style={styles.jobCard}>
                     <div style={styles.jobCardHeader}>
                       <h3 style={styles.jobTitle}>{job.title}</h3>
                       <span style={styles.jobStatus(job.status)}>{job.status}</span>
@@ -261,12 +285,15 @@ const JobProviderDashboard = () => {
                       <span>{job.salaryRange}</span>
                     </div>
                     <p style={styles.jobDescription}>{job.jobDescription}</p>
-                    <button 
-                      onClick={() => viewApplicants(job._id || job.id)} 
-                      style={styles.viewApplicantsButton}
-                    >
-                      View Applicants
-                    </button>
+                    <div style={styles.jobFooter}>
+                      <span>Applicants: {job.applicationCount || 0}</span>
+                      <button 
+                        onClick={() => fetchApplicants(job._id)} 
+                        style={styles.viewApplicantsButton}
+                      >
+                        View Applicants
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -277,28 +304,44 @@ const JobProviderDashboard = () => {
         return (
           <div style={styles.tabContent}>
             <h2 style={styles.tabTitle}>Job Applicants</h2>
-            {applicants.length === 0 ? (
+            {isLoading ? (
+              <div style={styles.loading}>Loading applicants...</div>
+            ) : error ? (
+              <div style={styles.errorMessage}>{error}</div>
+            ) : applicants.length === 0 ? (
               <p>No applicants yet.</p>
             ) : (
               <div style={styles.applicantList}>
                 <div style={styles.applicantHeader}>
-                  <span style={styles.headerItem}>Name</span>
-                  <span style={styles.headerItem}>Email</span>
+                  <span style={styles.headerItem}>Applicant ID</span>
                   <span style={styles.headerItem}>Status</span>
+                  <span style={styles.headerItem}>Applied Date</span>
                   <span style={styles.headerItem}>Actions</span>
                 </div>
                 {applicants.map(applicant => (
-                  <div key={applicant.id} style={styles.applicantRow}>
-                    <span style={styles.applicantData}>{applicant.name}</span>
-                    <span style={styles.applicantData}>{applicant.email}</span>
+                  <div key={applicant._id} style={styles.applicantRow}>
+                    <span style={styles.applicantData}>{applicant.userId}</span>
                     <span style={styles.applicantData}>
                       <span style={styles.statusBadge(applicant.status)}>
                         {applicant.status}
                       </span>
                     </span>
                     <span style={styles.applicantData}>
-                      <button style={styles.actionButton}>View Resume</button>
-                      <button style={styles.actionButton}>Contact</button>
+                      {new Date(applicant.appliedDate).toLocaleDateString()}
+                    </span>
+                    <span style={styles.applicantData}>
+                      <button 
+                        style={styles.actionButton}
+                        onClick={() => updateApplicationStatus(applicant._id, 'Reviewed')}
+                      >
+                        Mark Reviewed
+                      </button>
+                      <button 
+                        style={{...styles.actionButton, backgroundColor: '#e74c3c'}}
+                        onClick={() => updateApplicationStatus(applicant._id, 'Rejected')}
+                      >
+                        Reject
+                      </button>
                     </span>
                   </div>
                 ))}
@@ -341,8 +384,9 @@ const JobProviderDashboard = () => {
             View Jobs
           </button>
           <button 
-            onClick={() => setActiveTab('viewApplicants')} 
+            onClick={() => selectedJobId && setActiveTab('viewApplicants')} 
             style={activeTab === 'viewApplicants' ? styles.activeNavButton : styles.navButton}
+            disabled={!selectedJobId}
           >
             View Applicants
           </button>
@@ -578,6 +622,11 @@ const styles = {
     fontSize: '15px',
     lineHeight: '1.5'
   },
+  jobFooter: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
   viewApplicantsButton: {
     padding: '8px 15px',
     backgroundColor: '#2ecc71',
@@ -632,7 +681,9 @@ const styles = {
     borderRadius: '12px',
     fontSize: '12px',
     fontWeight: '600',
-    backgroundColor: status === 'Pending' ? '#f39c12' : '#2ecc71',
+    backgroundColor: status === 'Pending' ? '#f39c12' : 
+                   status === 'Reviewed' ? '#3498db' : 
+                   status === 'Rejected' ? '#e74c3c' : '#2ecc71',
     color: 'white'
   }),
   actionButton: {

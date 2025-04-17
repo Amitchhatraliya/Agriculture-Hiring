@@ -26,7 +26,6 @@ import AboutUs from './components/common/AboutUs'
 import EmployerDashboard from './components/employer/EmployerDashboard'
 import  WorkerDashboard  from './components/worker/WorkerDashboard'
 import AdminDashboard from './components/admin/AdminDashboard'
-import {Apply} from './components/worker/Apply'
 import { Login1 } from './components/common/Login1'
 
 
@@ -42,7 +41,6 @@ function App() {
         <Route path='/admindashboard'element={<AdminDashboard/>}></Route>
         <Route path='/employerdashboard'element={<EmployerDashboard/>}></Route>
         <Route path='/workerdashboard'element={<WorkerDashboard/>}></Route>
-        <Route path='/apply'element={<Apply/>}></Route>
         <Route path='/about-us'element={<AboutUs/>}></Route> 
         <Route path='/login'element={<Login/>}></Route>
         <Route path='/login1' element={<Login1/>}></Route>

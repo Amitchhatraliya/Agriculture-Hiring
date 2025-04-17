@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const JobSeekerDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -7,93 +7,59 @@ const JobSeekerDashboard = () => {
   const [jobs, setJobs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [profileViews, setProfileViews] = useState(0);
-  const navigate = useNavigate();
-  
-  // Fetch jobs data from API
-  useEffect(() => {
-    const fetchJobs = async () => {
-      setIsLoading(true);
-      try {
-        const response = await fetch('http://localhost:4000/job/getjob');
-        if (!response.ok) {
-          throw new Error('Failed to fetch jobs');
-        }
-        const data = await response.json();
-        if (data.message === "Job found" && data.data) {
-          setJobs(data.data);
-        } else {
-          setJobs([]);
-        }
-        setProfileViews(0);
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Error fetching jobs:", error);
-        setJobs([]);
-        setIsLoading(false);
+  const [userId] = useState('123'); // Replace with actual user ID from auth
+
+  // Fetch jobs and applications
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      // Fetch jobs
+      const jobsResponse = await axios.get('http://localhost:4000/job/getjob');
+      setJobs(jobsResponse.data.data || []);
+      
+      // Fetch user's applications
+      if (userId) {
+        const appsResponse = await axios.get(`http://localhost:4000/jobapplication/user/${userId}`);
+        setApplications(appsResponse.data || []);
       }
-    };
-
-    fetchJobs();
-  }, []);
-
-  // Fetch job applications when the component mounts or when the active tab changes to viewApplications
-  useEffect(() => {
-    if (activeTab === 'viewApplications') {
-      const fetchApplications = async () => {
-        setIsLoading(true);
-        try {
-          const response = await fetch('http://localhost:4000/jobapplication/getalljobapplicationwithfile');
-          if (!response.ok) {
-            throw new Error('Failed to fetch applications');
-          }
-          const data = await response.json();
-          if (data.message === "All job applications with files retrieved successfully" && data.data) {
-            // First fetch all jobs to have complete job data
-            const jobsResponse = await fetch('http://localhost:4000/job/getjob');
-            const jobsData = await jobsResponse.json();
-            const allJobs = jobsData.message === "Job found" ? jobsData.data : [];
-            
-            setApplications(data.data.map(app => {
-              const relatedJob = allJobs.find(job => job._id === app.jobId);
-              return {
-                id: app._id,
-                jobId: app.jobId,
-                title: relatedJob?.title || '',
-                company: relatedJob?.companyName || '',
-                appliedDate: new Date(app.createdAt).toISOString().split('T')[0],
-                status: app.status || 'Pending',
-                resume: app.resume,
-                coverletter: app.coverletter
-              };
-            }));
-          } else {
-            setApplications([]);
-          }
-          setIsLoading(false);
-        } catch (error) {
-          console.error("Error fetching applications:", error);
-          setApplications([]);
-          setIsLoading(false);
-        }
-      };
-
-      fetchApplications();
+      
+      setProfileViews(0); // Initialize profile views
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setIsLoading(false);
     }
-  }, [activeTab]);
+  };
 
-  const applyForJob = (jobId) => {
-    const jobToApply = jobs.find(job => job._id === jobId);
-    if (!jobToApply) return;
-    navigate("/apply");
-    const newApplication = {
-      id: Date.now(),
-      jobId,
-      title: jobToApply.title || 'No title',
-      company: jobToApply.companyName || 'Unknown company',
-      appliedDate: new Date().toISOString().split('T')[0],
-      status: 'Pending'
-    };
-    setApplications([...applications, newApplication]);
+  useEffect(() => {
+    fetchData();
+  }, [userId]);
+
+  const applyForJob = async (jobId) => {
+    try {
+      const response = await axios.post('http://localhost:4000/jobapplication', {
+        jobId,
+        userId,
+        status: 'Pending'
+      });
+      
+      // Update applications state with the new application
+      setApplications(prev => [...prev, response.data]);
+      
+      // Refresh jobs to get updated application counts
+      const jobsResponse = await axios.get('http://localhost:4000/job/getjob');
+      setJobs(jobsResponse.data.data || []);
+    } catch (error) {
+      console.error("Error applying for job:", error);
+    }
+  };
+
+  // Helper function to check if user has applied to a job
+  const hasApplied = (jobId) => {
+    return applications.some(app => {
+      const appliedJobId = typeof app.jobId === 'object' ? app.jobId._id : app.jobId;
+      return appliedJobId === jobId;
+    });
   };
 
   const renderTabContent = () => {
@@ -123,11 +89,11 @@ const JobSeekerDashboard = () => {
             ) : (
               <div style={styles.applicationsList}>
                 {applications.slice(0, 3).map(app => (
-                  <div key={app.id} style={styles.applicationCard}>
-                    <h4 style={styles.jobTitle}>{app.title}</h4>
-                    <p style={styles.companyName}>{app.company}</p>
+                  <div key={app._id} style={styles.applicationCard}>
+                    <h4 style={styles.jobTitle}>{app.jobId?.title || 'No title'}</h4>
+                    <p style={styles.companyName}>{app.jobId?.companyName || 'Unknown company'}</p>
                     <div style={styles.applicationMeta}>
-                      <span>Applied: {app.appliedDate}</span>
+                      <span>Applied: {new Date(app.appliedDate || Date.now()).toLocaleDateString()}</span>
                       <span style={styles.statusBadge(app.status)}>{app.status}</span>
                     </div>
                   </div>
@@ -154,17 +120,16 @@ const JobSeekerDashboard = () => {
                       <h3 style={styles.jobTitle}>{job.title || 'No title'}</h3>
                       <span style={styles.jobSalary}>{job.salaryRange || 'Salary not specified'}</span>
                     </div>
-                    <p style={styles.jobCompany}>{job.companyName}</p>
-                    <p style={styles.companyName}>{job.companyId || ''}  {job.location || 'Location not specified'}</p>                    
+                    <p style={styles.companyName}>{job.companyName || 'Unknown company'} • {job.location || 'Location not specified'}</p>
                     <p style={styles.jobDescription}>{job.jobDescription || 'No description provided'}</p>
                     <div style={styles.jobFooter}>
                       <span style={styles.postedDate}>Status: {job.status || 'Unknown'}</span>
                       <button 
                         onClick={() => applyForJob(job._id)} 
                         style={styles.applyButton}
-                        disabled={applications.some(app => app.jobId === job._id)}
+                        disabled={hasApplied(job._id)}
                       >
-                        {applications.some(app => app.jobId === job._id) ? 'Applied' : 'Apply Now'}
+                        {hasApplied(job._id) ? 'Applied' : 'Apply Now'}
                       </button>
                     </div>
                   </div>
@@ -177,11 +142,7 @@ const JobSeekerDashboard = () => {
         return (
           <div style={styles.tabContent}>
             <h2 style={styles.tabTitle}>Your Applications</h2>
-            {isLoading ? (
-              <div style={styles.loadingContainer}>
-                <p>Loading applications...</p>
-              </div>
-            ) : applications.length === 0 ? (
+            {applications.length === 0 ? (
               <p style={styles.noDataText}>You haven't applied to any jobs yet. Browse jobs to apply.</p>
             ) : (
               <div style={styles.applicationsTable}>
@@ -190,40 +151,14 @@ const JobSeekerDashboard = () => {
                   <span style={styles.headerItem}>Company</span>
                   <span style={styles.headerItem}>Applied Date</span>
                   <span style={styles.headerItem}>Status</span>
-                  <span style={styles.headerItem}>Documents</span>
                 </div>
                 {applications.map(app => (
-                  <div key={app.id} style={styles.tableRow}>
-                    <span style={styles.tableCell}>{app.title}</span>
-                    <span style={styles.tableCell}>{app.company}</span>
-                    <span style={styles.tableCell}>{app.appliedDate}</span>
+                  <div key={app._id} style={styles.tableRow}>
+                    <span style={styles.tableCell}>{app.jobId?.title || 'No title'}</span>
+                    <span style={styles.tableCell}>{app.jobId?.companyName || 'Unknown company'}</span>
+                    <span style={styles.tableCell}>{new Date(app.appliedDate || Date.now()).toLocaleDateString()}</span>
                     <span style={styles.tableCell}>
                       <span style={styles.statusBadge(app.status)}>{app.status}</span>
-                    </span>
-                    <span style={styles.tableCell}>
-                      {app.resume && (
-                        <a 
-                          href={app.resume} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          style={styles.documentLink}
-                        >
-                          Resume
-                        </a>
-                      )}
-                      {app.coverletter && (
-                        <>
-                          <span style={{ margin: '0 5px' }}>|</span>
-                          <a 
-                            href={app.coverletter} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            style={styles.documentLink}
-                          >
-                            Cover Letter
-                          </a>
-                        </>
-                      )}
                     </span>
                   </div>
                 ))}
@@ -502,7 +437,7 @@ const styles = {
   },
   tableHeader: {
     display: 'grid',
-    gridTemplateColumns: '2fr 2fr 1fr 1fr 1fr',
+    gridTemplateColumns: '2fr 2fr 1fr 1fr',
     backgroundColor: '#34495e',
     color: 'white',
     padding: '12px 15px',
@@ -511,7 +446,7 @@ const styles = {
   },
   tableRow: {
     display: 'grid',
-    gridTemplateColumns: '2fr 2fr 1fr 1fr 1fr',
+    gridTemplateColumns: '2fr 2fr 1fr 1fr',
     padding: '12px 15px',
     borderBottom: '1px solid #ecf0f1',
     alignItems: 'center',
@@ -525,18 +460,7 @@ const styles = {
     fontSize: '14px'
   },
   tableCell: {
-    fontSize: '14px',
-    display: 'flex',
-    alignItems: 'center'
-  },
-  documentLink: {
-    color: '#1abc9c',
-    textDecoration: 'none',
-    fontWeight: '500',
-    margin: '0 5px',
-    ':hover': {
-      textDecoration: 'underline'
-    }
+    fontSize: '14px'
   },
   noDataText: {
     color: '#7f8c8d',
