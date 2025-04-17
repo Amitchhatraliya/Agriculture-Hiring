@@ -1,36 +1,26 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+// models/Application.js
 
-const jobApplicationSchema = new Schema({
-    jobId:{
-        type: Schema.Types.ObjectId,
-        ref: "Job",
-    },
-    workerId:{
-        type: Schema.Types.ObjectId,
-        ref: "Worker",
-    },
-    firstName:{
-        type: String,
-        required: true,
-    },
-    lastName:{
-        type: String,
-        required: true,
-    },
-    resume:{
-        type: String,
-        // required: true,
-    },
-    coverletter:{
-        type: String,
-        // required: true,
-    },
-    // status:{
-    //     type: String,
-    //     required: true,
-    // },
-},{
-    timestamps: true
-})
-module.exports = mongoose.model('JobApplication', jobApplicationSchema);
+const mongoose = require('mongoose');
+
+const ApplicationSchema = new mongoose.Schema({
+  jobId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Job',
+    required: true
+  },
+  userId: {
+    type: String,
+    required: true
+  },
+  status: {
+    type: String,
+    enum: ['Pending', 'Reviewed', 'Rejected', 'Accepted'],
+    default: 'Pending'
+  },
+  appliedDate: {
+    type: Date,
+    default: Date.now
+  }
+});
+
+module.exports = mongoose.model('Application', ApplicationSchema);

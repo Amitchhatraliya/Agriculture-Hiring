@@ -5,8 +5,9 @@ const jobSchema = new Schema({
     companyName:{
         type: String,
         required: true,
-        unique: true,
+        // unique: true,
     },
+    
     title:{
         type: String,
         required: true,

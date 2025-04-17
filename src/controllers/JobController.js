@@ -26,4 +26,22 @@ const getAllJobByJobId = async (req, res) => {
     }
   };
 
-module.exports = { addJob, getAllJobByJobId };
+  const getJobsByEmployer = async (req, res) => {
+    try {
+      const { employerId } = req.params;
+      const jobs = await jobModel.find({ employerId });
+  
+      res.status(200).json({
+        success: true,
+        count: jobs.length,
+        data: jobs
+      });
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        message: err.message
+      });
+    }
+  };
+
+module.exports = { addJob, getAllJobByJobId , getJobsByEmployer };
