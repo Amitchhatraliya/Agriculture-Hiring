@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const JobSeekerDashboard = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [applications, setApplications] = useState([]);
   const [jobs, setJobs] = useState([]);
@@ -63,8 +65,8 @@ const JobSeekerDashboard = () => {
     });
   };
 
-   // Delete job function
-   const deleteJob = async (jobId) => {
+  // Delete job function
+  const deleteJob = async (jobId) => {
     try {
       await axios.delete(`http://localhost:4000/job/${jobId}`);
       // Refresh jobs list after deletion
@@ -96,6 +98,17 @@ const JobSeekerDashboard = () => {
     } catch (error) {
       console.error("Error deleting application:", error);
     }
+  };
+
+  // Logout function
+  const handleLogout = () => {
+    // Clear any authentication data
+    localStorage.removeItem('token');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('userId');
+    
+    // Redirect to login page
+    navigate('/login');
   };
   
   const renderTabContent = () => {
@@ -161,15 +174,6 @@ const JobSeekerDashboard = () => {
                     <div style={styles.jobFooter}>
                       <span style={styles.postedDate}>Status: {job.status || 'Unknown'}</span>
                       <div style={styles.jobActions}>
-                        {/* <select 
-                          value={job.status}
-                          onChange={(e) => updateJobStatus(job._id, e.target.value)}
-                          style={styles.statusSelect}
-                        >
-                          <option value="Open">Open</option>
-                          <option value="Closed">Closed</option>
-                          <option value="On Hold">On Hold</option>
-                        </select> */}
                         <button 
                           onClick={() => deleteJob(job._id)} 
                           style={styles.deleteButton}
@@ -259,7 +263,15 @@ const JobSeekerDashboard = () => {
         </nav>
         <div style={styles.profileSection}>
           <div style={styles.profileIcon}>JS</div>
-          <p style={styles.profileName}>Job Seeker</p>
+          <div>
+            <p style={styles.profileName}>Job Seeker</p>
+            <button 
+              onClick={handleLogout} 
+              style={styles.logoutButton}
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </div>
       <div style={styles.mainContent}>
@@ -346,6 +358,21 @@ const styles = {
     margin: '0',
     fontSize: '14px',
     fontWeight: '500'
+  },
+  logoutButton: {
+    padding: '5px 10px',
+    backgroundColor: 'transparent',
+    border: '1px solid #e74c3c',
+    color: '#e74c3c',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontSize: '12px',
+    transition: 'all 0.3s',
+    marginTop: '5px',
+    ':hover': {
+      backgroundColor: '#e74c3c',
+      color: 'white'
+    }
   },
   mainContent: {
     flex: '1',
@@ -437,11 +464,6 @@ const styles = {
     fontSize: '15px',
     lineHeight: '1.5'
   },
-  // jobFooter: {
-  //   display: 'flex',
-  //   justifyContent: 'space-between',
-  //   alignItems: 'center'
-  // },
   postedDate: {
     color: '#95a5a6',
     fontSize: '13px'
@@ -499,7 +521,7 @@ const styles = {
   },
   tableHeader: {
     display: 'grid',
-    gridTemplateColumns: '2fr 2fr 1fr 1fr 1fr', // Added one more column
+    gridTemplateColumns: '2fr 2fr 1fr 1fr 1fr',
     backgroundColor: '#34495e',
     color: 'white',
     padding: '12px 15px',
@@ -508,7 +530,7 @@ const styles = {
   },
   tableRow: {
     display: 'grid',
-    gridTemplateColumns: '2fr 2fr 1fr 1fr 1fr', // Added one more column
+    gridTemplateColumns: '2fr 2fr 1fr 1fr 1fr',
     padding: '12px 15px',
     borderBottom: '1px solid #ecf0f1',
     alignItems: 'center',
@@ -547,21 +569,14 @@ const styles = {
     gap: '10px',
     alignItems: 'center'
   },
-  statusSelect: {
-    padding: '6px 10px',
-    borderRadius: '5px',
-    border: '1px solid #ddd',
-    backgroundColor: '#f8f9fa',
-    cursor: 'pointer'
-  },
   deleteButton: {
-    padding: '6px 12px', // Smaller padding for table
+    padding: '6px 12px',
     backgroundColor: '#e74c3c',
     color: 'white',
     border: 'none',
     borderRadius: '5px',
     cursor: 'pointer',
-    fontSize: '13px', // Smaller font size
+    fontSize: '13px',
     fontWeight: '600',
     transition: 'all 0.3s',
     ':hover': {

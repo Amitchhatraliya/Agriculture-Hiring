@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const JobProviderDashboard = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [jobs, setJobs] = useState([]);
   const [applicants, setApplicants] = useState([]);
@@ -132,6 +134,7 @@ const JobProviderDashboard = () => {
       setIsLoading(false);
     }
   };
+
   const handleDeleteJob = async (jobId) => {
     if (!window.confirm('Are you sure you want to delete this job?')) return;
     
@@ -165,37 +168,48 @@ const JobProviderDashboard = () => {
     }
   };
 
+  const handleLogout = () => {
+    // Clear any user-related data from local storage
+    localStorage.removeItem('token');
+    localStorage.removeItem('userRole');
+    
+    // Redirect to login page
+    navigate('/login1');
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'dashboard':
-        return (
-          <div style={styles.tabContent}>
-            <h2 style={styles.tabTitle}>Dashboard Overview</h2>
-            <div style={styles.statsContainer}>
-              <div style={styles.statCard}>
-                <h3>Total Jobs Posted</h3>
-                <p style={styles.statNumber}>{jobs.length}</p>
-              </div>
-              <div style={styles.statCard}>
-                <h3>Total Applicants</h3>
-                <p style={styles.statNumber}>
-                  {jobs.reduce((total, job) => total + (job.applicationCount || 0), 0)}
-                </p>
-              </div>
-              <div style={styles.statCard}>
-                <h3>Active Listings</h3>
-                <p style={styles.statNumber}>{jobs.filter(job => job.status === 'Active').length}</p>
-              </div>
-            </div>
-          </div>
-        );
+  return (
+    <div style={styles.tabContent}>
+      <h2 style={styles.tabTitle}>Dashboard Overview</h2>
+      <div style={styles.statsContainer}>
+        <div style={styles.statCard}>
+          <h3>Total Jobs Posted</h3>
+          <p style={styles.statNumber}>{jobs.length}</p>
+        </div>
+        <div style={styles.statCard}>
+          <h3>Total Applicants</h3>
+          <p style={styles.statNumber}>
+            {jobs.reduce((total, job) => total + (job.applicationCount || 0), 0)}
+          </p>
+        </div>
+        <div style={styles.statCard}>
+          <h3>Active Listings</h3>
+          <p style={styles.statNumber}>
+            {jobs.filter(job => job.status === 'Active').length}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
       case 'addJob':
         return (
           <div style={styles.tabContent}>
             <h2 style={styles.tabTitle}>Add New Job</h2>
             {error && <div style={styles.errorMessage}>{error}</div>}
             <form onSubmit={handleAddJob} style={styles.jobForm}>
-            <div style={styles.formGroup}>
+              <div style={styles.formGroup}>
                 <label style={styles.label}>Company Name*</label>
                 <input
                   type="text"
@@ -578,7 +592,15 @@ const JobProviderDashboard = () => {
         </nav>
         <div style={styles.profileSection}>
           <div style={styles.profileIcon}>JP</div>
-          <p style={styles.profileName}>Job Provider</p>
+          <div>
+            <p style={styles.profileName}>Job Provider</p>
+            <button 
+              onClick={handleLogout} 
+              style={styles.logoutButton}
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </div>
       <div style={styles.mainContent}>
@@ -690,7 +712,22 @@ const styles = {
   },
   profileName: {
     margin: '0',
-    fontSize: '14px'
+    fontSize: '14px',
+    marginBottom: '5px'
+  },
+  logoutButton: {
+    padding: '5px 10px',
+    backgroundColor: 'transparent',
+    border: '1px solid #e74c3c',
+    color: '#e74c3c',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontSize: '12px',
+    transition: 'all 0.3s',
+    ':hover': {
+      backgroundColor: '#e74c3c',
+      color: 'white'
+    }
   },
   mainContent: {
     flex: '1',
