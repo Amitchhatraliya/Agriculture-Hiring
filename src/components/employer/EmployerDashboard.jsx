@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import '../../assets/landing/css/employer.css';
 
 const JobProviderDashboard = () => {
   const navigate = useNavigate();
@@ -74,7 +75,8 @@ const JobProviderDashboard = () => {
     setError(null);
     
     try {
-      if (!newJob.companyName || !newJob.title || !newJob.jobDescription || !newJob.location || !newJob.salaryRange) {
+      if (!newJob.companyName || !newJob.title || !newJob.jobDescription || 
+          !newJob.location || !newJob.salaryRange) {
         throw new Error('Please fill all required fields');
       }
 
@@ -169,120 +171,154 @@ const JobProviderDashboard = () => {
   };
 
   const handleLogout = () => {
-    // Clear any user-related data from local storage
     localStorage.removeItem('token');
     localStorage.removeItem('userRole');
-    
-    // Redirect to login page
     navigate('/login1');
   };
 
   const renderTabContent = () => {
     switch (activeTab) {
       case 'dashboard':
-  return (
-    <div style={styles.tabContent}>
-      <h2 style={styles.tabTitle}>Dashboard Overview</h2>
-      <div style={styles.statsContainer}>
-        <div style={styles.statCard}>
-          <h3>Total Jobs Posted</h3>
-          <p style={styles.statNumber}>{jobs.length}</p>
-        </div>
-        <div style={styles.statCard}>
-          <h3>Total Applicants</h3>
-          <p style={styles.statNumber}>
-            {jobs.reduce((total, job) => total + (job.applicationCount || 0), 0)}
-          </p>
-        </div>
-        <div style={styles.statCard}>
-          <h3>Active Listings</h3>
-          <p style={styles.statNumber}>
-            {jobs.filter(job => job.status === 'Active').length}
-          </p>
-        </div>
-      </div>
-    </div>
-  );
+        return (
+          <div className="tab-content">
+            <h2 className="tab-title">Dashboard Overview</h2>
+            <div className="stats-container">
+              <div className="stat-card">
+                <div className="stat-icon">
+                  <i className="fas fa-briefcase"></i>
+                </div>
+                <h3>Total Jobs Posted</h3>
+                <p className="stat-number">{jobs.length}</p>
+              </div>
+              <div className="stat-card">
+                <div className="stat-icon">
+                  <i className="fas fa-users"></i>
+                </div>
+                <h3>Total Applicants</h3>
+                <p className="stat-number">
+                  {jobs.reduce((total, job) => total + (job.applicationCount || 0), 0)}
+                </p>
+              </div>
+              <div className="stat-card">
+                <div className="stat-icon">
+                  <i className="fas fa-check-circle"></i>
+                </div>
+                <h3>Active Listings</h3>
+                <p className="stat-number">
+                  {jobs.filter(job => job.status === 'Active').length}
+                </p>
+              </div>
+              <div className="stat-card">
+                <div className="stat-icon">
+                  <i className="fas fa-chart-line"></i>
+                </div>
+                <h3>Recent Activity</h3>
+                <p className="stat-number">
+                  {jobs.length > 0 ? 'Active' : 'None'}
+                </p>
+              </div>
+            </div>
+            
+            <div className="recent-jobs-section">
+              <h3>Recent Job Postings</h3>
+              {jobs.slice(0, 3).map(job => (
+                <div key={job._id} className="recent-job-card">
+                  <div className="recent-job-header">
+                    <h4>{job.title}</h4>
+                    <span className={`job-status status-${job.status.toLowerCase()}`}>
+                      {job.status}
+                    </span>
+                  </div>
+                  <p className="recent-job-company">{job.companyName}</p>
+                  <div className="recent-job-meta">
+                    <span><i className="fas fa-map-marker-alt"></i> {job.location}</span>
+                    <span><i className="fas fa-clock"></i> {job.employmentType}</span>
+                    <span><i className="fas fa-money-bill-wave"></i> {job.salaryRange}</span>
+                  </div>
+                </div>
+              ))}
+              {jobs.length === 0 && <p className="no-data">No recent job postings</p>}
+            </div>
+          </div>
+        );
+      
       case 'addJob':
         return (
-          <div style={styles.tabContent}>
-            <h2 style={styles.tabTitle}>Add New Job</h2>
-            {error && <div style={styles.errorMessage}>{error}</div>}
-            <form onSubmit={handleAddJob} style={styles.jobForm}>
-              <div style={styles.formGroup}>
-                <label style={styles.label}>Company Name*</label>
-                <input
-                  type="text"
-                  name="companyName"
-                  value={newJob.companyName}
-                  onChange={handleInputChange}
-                  style={styles.input}
-                  required
-                  placeholder="Enter company name"
-                />
+          <div className="tab-content">
+            <h2 className="tab-title">Add New Job</h2>
+            {error && <div className="error-message">{error}</div>}
+            <form onSubmit={handleAddJob} className="job-form">
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Company Name*</label>
+                  <input
+                    type="text"
+                    name="companyName"
+                    value={newJob.companyName}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="Enter company name"
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>Job Title*</label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={newJob.title}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="Enter job title"
+                  />
+                </div>
               </div>
               
-              <div style={styles.formGroup}>
-                <label style={styles.label}>Job Title*</label>
-                <input
-                  type="text"
-                  name="title"
-                  value={newJob.title}
-                  onChange={handleInputChange}
-                  style={styles.input}
-                  required
-                  placeholder="Enter job title"
-                />
-              </div>
-              
-              <div style={styles.formGroup}>
-                <label style={styles.label}>Job Description*</label>
+              <div className="form-group">
+                <label>Job Description*</label>
                 <textarea
                   name="jobDescription"
                   value={newJob.jobDescription}
                   onChange={handleInputChange}
-                  style={{ ...styles.input, height: '120px' }}
                   required
                   placeholder="Enter detailed job description"
+                  rows="5"
                 />
               </div>
               
-              <div style={styles.formRow}>
-                <div style={{ ...styles.formGroup, flex: 1 }}>
-                  <label style={styles.label}>Location*</label>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Location*</label>
                   <input
                     type="text"
                     name="location"
                     value={newJob.location}
                     onChange={handleInputChange}
-                    style={styles.input}
                     required
-                    placeholder="e.g. New York"
+                    placeholder="e.g. Ahmedabad, Gujarat"
                   />
                 </div>
                 
-                <div style={{ ...styles.formGroup, flex: 1 }}>
-                  <label style={styles.label}>Salary Range*</label>
+                <div className="form-group">
+                  <label>Salary Range*</label>
                   <input
                     type="text"
                     name="salaryRange"
                     value={newJob.salaryRange}
                     onChange={handleInputChange}
-                    style={styles.input}
                     required
-                    placeholder="e.g. $50,000 - $70,000"
+                    placeholder="e.g. 900/- per day or 25000/-"
                   />
                 </div>
               </div>
               
-              <div style={styles.formRow}>
-                <div style={{ ...styles.formGroup, flex: 1 }}>
-                  <label style={styles.label}>Status*</label>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Status*</label>
                   <select
                     name="status"
                     value={newJob.status}
                     onChange={handleInputChange}
-                    style={styles.input}
                     required
                   >
                     <option value="Active">Active</option>
@@ -291,13 +327,12 @@ const JobProviderDashboard = () => {
                   </select>
                 </div>
                 
-                <div style={{ ...styles.formGroup, flex: 1 }}>
-                  <label style={styles.label}>Employment Type*</label>
+                <div className="form-group">
+                  <label>Employment Type*</label>
                   <select
                     name="employmentType"
                     value={newJob.employmentType}
                     onChange={handleInputChange}
-                    style={styles.input}
                     required
                   >
                     <option value="Full-Time">Full-Time</option>
@@ -308,96 +343,103 @@ const JobProviderDashboard = () => {
                 </div>
               </div>
               
-              <button 
-                type="submit" 
-                style={styles.submitButton}
-                disabled={isLoading}
-              >
-                {isLoading ? 'Posting...' : 'Post Job'}
-              </button>
+              <div className="form-actions">
+                <button 
+                  type="submit" 
+                  className="btn btn-primary"
+                  disabled={isLoading}
+                >
+                  {isLoading ? <><i className="fas fa-spinner fa-spin"></i> Posting...</> : <><i className="fas fa-plus"></i> Post Job</>}
+                </button>
+                <button 
+                  type="button" 
+                  className="btn btn-secondary"
+                  onClick={() => setActiveTab('viewJobs')}
+                >
+                  <i className="fas fa-times"></i> Cancel
+                </button>
+              </div>
             </form>
           </div>
         );
+      
       case 'editJob':
         return (
-          <div style={styles.tabContent}>
-            <h2 style={styles.tabTitle}>Edit Job</h2>
-            {error && <div style={styles.errorMessage}>{error}</div>}
-            <form onSubmit={handleUpdateJob} style={styles.jobForm}>
-              <div style={styles.formGroup}>
-                <label style={styles.label}>Company Name*</label>
-                <input
-                  type="text"
-                  name="companyName"
-                  value={editingJob.companyName}
-                  onChange={handleInputChange}
-                  style={styles.input}
-                  required
-                  placeholder="Enter company name"
-                />
+          <div className="tab-content">
+            <h2 className="tab-title">Edit Job</h2>
+            {error && <div className="error-message">{error}</div>}
+            <form onSubmit={handleUpdateJob} className="job-form">
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Company Name*</label>
+                  <input
+                    type="text"
+                    name="companyName"
+                    value={editingJob.companyName}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="Enter company name"
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>Job Title*</label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={editingJob.title}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="Enter job title"
+                  />
+                </div>
               </div>
               
-              <div style={styles.formGroup}>
-                <label style={styles.label}>Job Title*</label>
-                <input
-                  type="text"
-                  name="title"
-                  value={editingJob.title}
-                  onChange={handleInputChange}
-                  style={styles.input}
-                  required
-                  placeholder="Enter job title"
-                />
-              </div>
-              
-              <div style={styles.formGroup}>
-                <label style={styles.label}>Job Description*</label>
+              <div className="form-group">
+                <label>Job Description*</label>
                 <textarea
                   name="jobDescription"
                   value={editingJob.jobDescription}
                   onChange={handleInputChange}
-                  style={{ ...styles.input, height: '120px' }}
                   required
                   placeholder="Enter detailed job description"
+                  rows="5"
                 />
               </div>
               
-              <div style={styles.formRow}>
-                <div style={{ ...styles.formGroup, flex: 1 }}>
-                  <label style={styles.label}>Location*</label>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Location*</label>
                   <input
                     type="text"
                     name="location"
                     value={editingJob.location}
                     onChange={handleInputChange}
-                    style={styles.input}
                     required
                     placeholder="e.g. New York"
                   />
                 </div>
                 
-                <div style={{ ...styles.formGroup, flex: 1 }}>
-                  <label style={styles.label}>Salary Range*</label>
+                <div className="form-group">
+                  <label>Salary Range*</label>
                   <input
                     type="text"
                     name="salaryRange"
                     value={editingJob.salaryRange}
                     onChange={handleInputChange}
-                    style={styles.input}
                     required
                     placeholder="e.g. $50,000 - $70,000"
                   />
                 </div>
               </div>
               
-              <div style={styles.formRow}>
-                <div style={{ ...styles.formGroup, flex: 1 }}>
-                  <label style={styles.label}>Status*</label>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Status*</label>
                   <select
                     name="status"
                     value={editingJob.status}
                     onChange={handleInputChange}
-                    style={styles.input}
                     required
                   >
                     <option value="Active">Active</option>
@@ -406,13 +448,12 @@ const JobProviderDashboard = () => {
                   </select>
                 </div>
                 
-                <div style={{ ...styles.formGroup, flex: 1 }}>
-                  <label style={styles.label}>Employment Type*</label>
+                <div className="form-group">
+                  <label>Employment Type*</label>
                   <select
                     name="employmentType"
                     value={editingJob.employmentType}
                     onChange={handleInputChange}
-                    style={styles.input}
                     required
                   >
                     <option value="Full-Time">Full-Time</option>
@@ -423,73 +464,100 @@ const JobProviderDashboard = () => {
                 </div>
               </div>
               
-              <div style={styles.formRow}>
+              <div className="form-actions">
                 <button 
                   type="submit" 
-                  style={styles.submitButton}
+                  className="btn btn-primary"
                   disabled={isLoading}
                 >
-                  {isLoading ? 'Updating...' : 'Update Job'}
+                  {isLoading ? <><i className="fas fa-spinner fa-spin"></i> Updating...</> : <><i className="fas fa-save"></i> Update Job</>}
                 </button>
                 <button 
                   type="button" 
-                  style={{...styles.submitButton, backgroundColor: '#95a5a6'}}
+                  className="btn btn-secondary"
                   onClick={() => {
                     setEditingJob(null);
                     setActiveTab('viewJobs');
                   }}
                 >
-                  Cancel
+                  <i className="fas fa-times"></i> Cancel
                 </button>
               </div>
             </form>
           </div>
         );
+      
       case 'viewJobs':
         return (
-          <div style={styles.tabContent}>
-            <h2 style={styles.tabTitle}>Posted Jobs</h2>
+          <div className="tab-content">
+            <div className="section-header">
+              <h2 className="tab-title">Posted Jobs</h2>
+              <button 
+                onClick={() => setActiveTab('addJob')} 
+                className="btn btn-primary"
+              >
+                <i className="fas fa-plus"></i> Add New Job
+              </button>
+            </div>
+            
             {isLoading ? (
-              <div style={styles.loading}>Loading jobs...</div>
+              <div className="loading">
+                <i className="fas fa-spinner fa-spin"></i> Loading jobs...
+              </div>
             ) : error ? (
-              <div style={styles.errorMessage}>{error}</div>
+              <div className="error-message">{error}</div>
             ) : jobs.length === 0 ? (
-              <p>No jobs posted yet.</p>
+              <div className="no-jobs">
+                <i className="fas fa-briefcase"></i>
+                <p>No jobs posted yet.</p>
+                <button 
+                  onClick={() => setActiveTab('addJob')} 
+                  className="btn btn-primary"
+                >
+                  Post Your First Job
+                </button>
+              </div>
             ) : (
-              <div style={styles.jobList}>
+              <div className="job-list">
                 {jobs.map(job => (
-                  <div key={job._id} style={styles.jobCard}>
-                    <div style={styles.jobCardHeader}>
-                      <h3 style={styles.jobTitle}>{job.title}</h3>
-                      <span style={styles.jobStatus(job.status)}>{job.status}</span>
+                  <div key={job._id} className="job-card">
+                    <div className="job-card-header">
+                      <h3 className="job-title">{job.title}</h3>
+                      <span className={`job-status status-${job.status.toLowerCase()}`}>
+                        {job.status}
+                      </span>
                     </div>
-                    <p style={styles.jobCompany}>{job.companyName}</p>
-                    <div style={styles.jobMeta}>
-                      <span>{job.location}</span>
-                      <span>{job.employmentType}</span>
-                      <span>{job.salaryRange}</span>
+                    <p className="job-company">
+                      <i className="fas fa-building"></i> {job.companyName}
+                    </p>
+                    <div className="job-meta">
+                      <span><i className="fas fa-map-marker-alt"></i> {job.location}</span>
+                      <span><i className="fas fa-clock"></i> {job.employmentType}</span>
+                      <span><i className="fas fa-money-bill-wave"></i> {job.salaryRange}</span>
                     </div>
-                    <p style={styles.jobDescription}>{job.jobDescription}</p>
-                    <div style={styles.jobFooter}>
-                      <span>Applicants: {job.applicationCount || 0}</span>
-                      <div style={styles.jobActions}>
+                    <p className="job-description">{job.jobDescription}</p>
+                    <div className="job-footer">
+                      <span className="applicants-count">
+                        <i className="fas fa-users"></i> {job.applicationCount || 0} Applicants
+                      </span>
+                      <div className="job-actions">
                         <button 
                           onClick={() => fetchApplicants(job._id)} 
-                          style={styles.viewApplicantsButton}
+                          className="btn btn-view-applicants"
                         >
-                          Applicants
+                          <i className="fas fa-user-friends"></i> View Applicants
                         </button>
                         <button 
                           onClick={() => startEditingJob(job)} 
-                          style={styles.editButton}
+                          className="btn btn-edit"
                         >
-                          Edit
+                          <i className="fas fa-edit"></i> Edit
                         </button>
                         <button 
                           onClick={() => handleDeleteJob(job._id)} 
-                          style={styles.deleteButton}
+                          className="btn btn-delete"
                         >
-                          Delete
+                          <i className="fas fa-trash-alt"></i> Delete
                         </button>
                       </div>
                     </div>
@@ -499,486 +567,140 @@ const JobProviderDashboard = () => {
             )}
           </div>
         );
+      
       case 'viewApplicants':
         return (
-          <div style={styles.tabContent}>
-            <h2 style={styles.tabTitle}>Job Applicants</h2>
+          <div className="tab-content">
+            <div className="section-header">
+              <h2 className="tab-title">Job Applicants</h2>
+              <button 
+                onClick={() => setActiveTab('viewJobs')} 
+                className="btn btn-secondary"
+              >
+                <i className="fas fa-arrow-left"></i> Back to Jobs
+              </button>
+            </div>
+            
             {isLoading ? (
-              <div style={styles.loading}>Loading applicants...</div>
+              <div className="loading">
+                <i className="fas fa-spinner fa-spin"></i> Loading applicants...
+              </div>
             ) : error ? (
-              <div style={styles.errorMessage}>{error}</div>
+              <div className="error-message">{error}</div>
             ) : applicants.length === 0 ? (
-              <p>No applicants yet.</p>
+              <div className="no-applicants">
+                <i className="fas fa-user-friends"></i>
+                <p>No applicants for this job yet.</p>
+              </div>
             ) : (
-              <div style={styles.applicantList}>
-                <div style={styles.applicantHeader}>
-                  <span style={styles.headerItem}>Applicant ID</span>
-                  <span style={styles.headerItem}>Status</span>
-                  <span style={styles.headerItem}>Applied Date</span>
-                  <span style={styles.headerItem}>Actions</span>
+              <div className="applicant-list-container">
+                <div className="applicant-list-header">
+                  <span>Applicant Name</span>
+                  <span>Status</span>
+                  <span>Applied Date</span>
+                  <span>Actions</span>
                 </div>
                 {applicants.map(applicant => (
-                  <div key={applicant._id} style={styles.applicantRow}>
-                    <span style={styles.applicantData}>{applicant.userId}</span>
-                    <span style={styles.applicantData}>
-                      <span style={styles.statusBadge(applicant.status)}>
+                  <div key={applicant._id} className="applicant-row">
+                    <span className="applicant-data">
+                      <i className="fas fa-user"></i> {applicant.userId || 'N/A'}
+                    </span>
+                    <span className="applicant-data">
+                      <span className={`status-badge status-${applicant.status.toLowerCase()}`}>
                         {applicant.status}
                       </span>
                     </span>
-                    <span style={styles.applicantData}>
-                      {new Date(applicant.appliedDate).toLocaleDateString()}
+                    <span className="applicant-data">
+                      <i className="fas fa-calendar-alt"></i> {new Date(applicant.appliedDate).toLocaleDateString()}
                     </span>
-                    <span style={styles.applicantData}>
+                    <span className="applicant-actions">
                       <button 
-                        style={styles.actionButton}
+                        className="btn btn-sm btn-reviewed"
                         onClick={() => updateApplicationStatus(applicant._id, 'Reviewed')}
                       >
-                        Mark Reviewed
+                        <i className="fas fa-check-circle"></i> Reviewed
                       </button>
                       <button 
-                        style={{...styles.actionButton, backgroundColor: '#e74c3c'}}
+                        className="btn btn-sm btn-rejected"
                         onClick={() => updateApplicationStatus(applicant._id, 'Rejected')}
                       >
-                        Reject
+                        <i className="fas fa-times-circle"></i> Reject
                       </button>
                     </span>
                   </div>
                 ))}
               </div>
             )}
-            <button 
-              onClick={() => setActiveTab('viewJobs')} 
-              style={styles.backButton}
-            >
-              Back to Jobs
-            </button>
           </div>
         );
+      
       default:
         return null;
     }
   };
 
   return (
-    <div style={styles.dashboardContainer}>
-      <div style={styles.sidebar}>
-        <h1 style={styles.logo}>JobConnect</h1>
-        <nav style={styles.nav}>
+    <div className="dashboard-container">
+      <div className="sidebar">
+        <div className="sidebar-header">
+          <h1 className="logo">
+            <i className="fas fa-handshake"></i> JobConnect
+          </h1>
+          <p className="role-badge">Job Provider</p>
+        </div>
+        
+        <nav className="nav-menu">
           <button 
             onClick={() => setActiveTab('dashboard')} 
-            style={activeTab === 'dashboard' ? styles.activeNavButton : styles.navButton}
+            className={`nav-button ${activeTab === 'dashboard' ? 'active' : ''}`}
           >
-            Dashboard Overview
+            <i className="fas fa-tachometer-alt"></i> Dashboard
           </button>
           <button 
             onClick={() => setActiveTab('addJob')} 
-            style={activeTab === 'addJob' ? styles.activeNavButton : styles.navButton}
+            className={`nav-button ${activeTab === 'addJob' ? 'active' : ''}`}
           >
-            Add Job
+            <i className="fas fa-plus-circle"></i> Add Job
           </button>
           <button 
             onClick={() => setActiveTab('viewJobs')} 
-            style={activeTab === 'viewJobs' ? styles.activeNavButton : styles.navButton}
+            className={`nav-button ${activeTab === 'viewJobs' ? 'active' : ''}`}
           >
-            View Jobs
+            <i className="fas fa-briefcase"></i> View Jobs
           </button>
           <button 
             onClick={() => selectedJobId && setActiveTab('viewApplicants')} 
-            style={activeTab === 'viewApplicants' ? styles.activeNavButton : styles.navButton}
+            className={`nav-button ${activeTab === 'viewApplicants' ? 'active' : ''}`}
             disabled={!selectedJobId}
           >
-            View Applicants
+            <i className="fas fa-user-friends"></i> View Applicants
           </button>
         </nav>
-        <div style={styles.profileSection}>
-          <div style={styles.profileIcon}>JP</div>
-          <div>
-            <p style={styles.profileName}>Job Provider</p>
-            <button 
-              onClick={handleLogout} 
-              style={styles.logoutButton}
-            >
-              Logout
-            </button>
+        
+        <div className="profile-section">
+          <div className="profile-info">
+            <div className="profile-icon">
+              <i className="fas fa-user-tie"></i>
+            </div>
+            <div>
+              <p className="profile-name">Job Provider</p>
+              <p className="profile-email">provider@jobconnect.com</p>
+            </div>
           </div>
+          <button 
+            onClick={handleLogout} 
+            className="logout-button"
+          >
+            <i className="fas fa-sign-out-alt"></i> Logout
+          </button>
         </div>
       </div>
-      <div style={styles.mainContent}>
+      
+      <div className="main-content">
         {renderTabContent()}
       </div>
     </div>
   );
-};
-
-const styles = {
-  jobActions: {
-    display: 'flex',
-    gap: '8px'
-  },
-  editButton: {
-    padding: '8px 15px',
-    backgroundColor: '#3498db',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    transition: 'background-color 0.3s',
-    ':hover': {
-      backgroundColor: '#2980b9'
-    }
-  },
-  deleteButton: {
-    padding: '8px 15px',
-    backgroundColor: '#e74c3c',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    transition: 'background-color 0.3s',
-    ':hover': {
-      backgroundColor: '#c0392b'
-    }
-  },
-  dashboardContainer: {
-    display: 'flex',
-    minHeight: '100vh',
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-    backgroundColor: '#f5f5f5'
-  },
-  sidebar: {
-    width: '250px',
-    backgroundColor: '#2c3e50',
-    color: 'white',
-    padding: '20px',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between'
-  },
-  logo: {
-    fontSize: '24px',
-    marginBottom: '40px',
-    color: '#3498db',
-    textAlign: 'center'
-  },
-  nav: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '10px'
-  },
-  navButton: {
-    padding: '12px 15px',
-    backgroundColor: 'transparent',
-    border: 'none',
-    color: 'white',
-    textAlign: 'left',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    fontSize: '16px',
-    transition: 'background-color 0.3s',
-    ':hover': {
-      backgroundColor: '#34495e'
-    }
-  },
-  activeNavButton: {
-    padding: '12px 15px',
-    backgroundColor: '#3498db',
-    border: 'none',
-    color: 'white',
-    textAlign: 'left',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    fontSize: '16px',
-    fontWeight: 'bold'
-  },
-  profileSection: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    marginTop: 'auto',
-    paddingTop: '20px',
-    borderTop: '1px solid #34495e'
-  },
-  profileIcon: {
-    width: '40px',
-    height: '40px',
-    borderRadius: '50%',
-    backgroundColor: '#3498db',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontWeight: 'bold'
-  },
-  profileName: {
-    margin: '0',
-    fontSize: '14px',
-    marginBottom: '5px'
-  },
-  logoutButton: {
-    padding: '5px 10px',
-    backgroundColor: 'transparent',
-    border: '1px solid #e74c3c',
-    color: '#e74c3c',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontSize: '12px',
-    transition: 'all 0.3s',
-    ':hover': {
-      backgroundColor: '#e74c3c',
-      color: 'white'
-    }
-  },
-  mainContent: {
-    flex: '1',
-    padding: '30px',
-    backgroundColor: 'white',
-    borderRadius: '10px 0 0 0',
-    boxShadow: '0 0 10px rgba(0,0,0,0.1)'
-  },
-  tabContent: {
-    maxWidth: '1000px',
-    margin: '0 auto'
-  },
-  tabTitle: {
-    color: '#2c3e50',
-    marginBottom: '30px',
-    fontSize: '24px',
-    fontWeight: '600'
-  },
-  statsContainer: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-    gap: '20px',
-    marginBottom: '30px'
-  },
-  statCard: {
-    backgroundColor: '#f8f9fa',
-    padding: '20px',
-    borderRadius: '8px',
-    boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-    textAlign: 'center',
-    transition: 'transform 0.3s',
-    ':hover': {
-      transform: 'translateY(-5px)'
-    }
-  },
-  statNumber: {
-    fontSize: '24px',
-    fontWeight: 'bold',
-    color: '#3498db',
-    margin: '10px 0 0'
-  },
-  jobForm: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px',
-    maxWidth: '800px'
-  },
-  formRow: {
-    display: 'flex',
-    gap: '20px'
-  },
-  formGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px'
-  },
-  label: {
-    fontWeight: '600',
-    color: '#2c3e50',
-    fontSize: '14px'
-  },
-  input: {
-    padding: '12px',
-    border: '1px solid #ddd',
-    borderRadius: '5px',
-    fontSize: '16px',
-    transition: 'border 0.3s',
-    ':focus': {
-      outline: 'none',
-      borderColor: '#3498db'
-    }
-  },
-  submitButton: {
-    padding: '12px 20px',
-    backgroundColor: '#3498db',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    fontSize: '16px',
-    fontWeight: 'bold',
-    transition: 'background-color 0.3s',
-    ':hover': {
-      backgroundColor: '#2980b9'
-    },
-    marginTop: '10px',
-    ':disabled': {
-      backgroundColor: '#95a5a6',
-      cursor: 'not-allowed'
-    }
-  },
-  jobList: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
-    gap: '20px'
-  },
-  jobCard: {
-    backgroundColor: '#f8f9fa',
-    padding: '20px',
-    borderRadius: '8px',
-    boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-    transition: 'transform 0.3s',
-    ':hover': {
-      transform: 'translateY(-3px)',
-      boxShadow: '0 4px 8px rgba(0,0,0,0.15)'
-    }
-  },
-  jobCardHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '10px'
-  },
-  jobTitle: {
-    margin: '0',
-    color: '#2c3e50',
-    fontSize: '18px'
-  },
-  jobCompany: {
-    margin: '0 0 10px',
-    color: '#3498db',
-    fontSize: '15px',
-    fontWeight: '500'
-  },
-  jobStatus: (status) => ({
-    padding: '4px 10px',
-    borderRadius: '12px',
-    fontSize: '12px',
-    fontWeight: '600',
-    backgroundColor: status === 'Active' ? '#2ecc71' : status === 'Closed' ? '#e74c3c' : '#95a5a6',
-    color: 'white'
-  }),
-  jobMeta: {
-    margin: '0 0 10px',
-    color: '#7f8c8d',
-    fontSize: '14px',
-    display: 'flex',
-    gap: '8px',
-    alignItems: 'center'
-  },
-  jobDescription: {
-    margin: '0 0 15px',
-    color: '#34495e',
-    fontSize: '15px',
-    lineHeight: '1.5'
-  },
-  jobFooter: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center'
-  },
-  viewApplicantsButton: {
-    padding: '8px 15px',
-    backgroundColor: '#2ecc71',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    transition: 'background-color 0.3s',
-    ':hover': {
-      backgroundColor: '#27ae60'
-    }
-  },
-  applicantList: {
-    display: 'flex',
-    flexDirection: 'column',
-    border: '1px solid #eee',
-    borderRadius: '8px',
-    overflow: 'hidden'
-  },
-  applicantHeader: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr 1fr 1.5fr',
-    backgroundColor: '#2c3e50',
-    color: 'white',
-    padding: '12px 15px',
-    fontWeight: '600'
-  },
-  applicantRow: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr 1fr 1.5fr',
-    padding: '12px 15px',
-    borderBottom: '1px solid #eee',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    transition: 'background-color 0.2s',
-    ':hover': {
-      backgroundColor: '#f8f9fa'
-    }
-  },
-  headerItem: {
-    fontSize: '14px'
-  },
-  applicantData: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    fontSize: '14px'
-  },
-  statusBadge: (status) => ({
-    padding: '4px 8px',
-    borderRadius: '12px',
-    fontSize: '12px',
-    fontWeight: '600',
-    backgroundColor: status === 'Pending' ? '#f39c12' : 
-                   status === 'Reviewed' ? '#3498db' : 
-                   status === 'Rejected' ? '#e74c3c' : '#2ecc71',
-    color: 'white'
-  }),
-  actionButton: {
-    padding: '6px 12px',
-    backgroundColor: '#3498db',
-    color: 'white',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontSize: '13px',
-    marginRight: '8px',
-    transition: 'background-color 0.3s',
-    ':hover': {
-      backgroundColor: '#2980b9'
-    }
-  },
-  backButton: {
-    padding: '10px 20px',
-    backgroundColor: '#95a5a6',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    fontSize: '16px',
-    marginTop: '20px',
-    transition: 'background-color 0.3s',
-    ':hover': {
-      backgroundColor: '#7f8c8d'
-    }
-  },
-  errorMessage: {
-    color: '#e74c3c',
-    backgroundColor: '#fadbd8',
-    padding: '10px 15px',
-    borderRadius: '5px',
-    marginBottom: '20px',
-    border: '1px solid #f5b7b1'
-  },
-  loading: {
-    color: '#3498db',
-    textAlign: 'center',
-    padding: '20px'
-  }
 };
 
 export default JobProviderDashboard;

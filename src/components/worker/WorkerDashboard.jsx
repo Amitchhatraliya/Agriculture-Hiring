@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import '../../assets/landing/css/worker.css';
 
 const JobSeekerDashboard = () => {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ const JobSeekerDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [profileViews, setProfileViews] = useState(0);
   const [userId] = useState('123'); // Replace with actual user ID from auth
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Fetch jobs and applications
   const fetchData = async () => {
@@ -25,7 +27,8 @@ const JobSeekerDashboard = () => {
         setApplications(appsResponse.data || []);
       }
       
-      setProfileViews(0); // Initialize profile views
+      // Simulate profile views (in a real app, this would come from the backend)
+      setProfileViews(Math.floor(Math.random() * 100));
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -45,18 +48,19 @@ const JobSeekerDashboard = () => {
         status: 'Pending'
       });
       
-      // Update applications state with the new application
       setApplications(prev => [...prev, response.data]);
       
-      // Refresh jobs to get updated application counts
       const jobsResponse = await axios.get('http://localhost:4000/job/getjob');
       setJobs(jobsResponse.data.data || []);
+      
+      // Show success notification
+      alert('Application submitted successfully!');
     } catch (error) {
       console.error("Error applying for job:", error);
+      alert('Failed to apply for job. Please try again.');
     }
   };
 
-  // Helper function to check if user has applied to a job
   const hasApplied = (jobId) => {
     return applications.some(app => {
       if (!app.jobId) return false;
@@ -65,127 +69,197 @@ const JobSeekerDashboard = () => {
     });
   };
 
-  // Delete job function
-  const deleteJob = async (jobId) => {
-    try {
-      await axios.delete(`http://localhost:4000/job/${jobId}`);
-      // Refresh jobs list after deletion
-      fetchData();
-    } catch (error) {
-      console.error("Error deleting job:", error);
-    }
-  };
-
-  // Update job status function
-  const updateJobStatus = async (jobId, newStatus) => {
-    try {
-      await axios.patch(`http://localhost:4000/job/${jobId}`, {
-        status: newStatus
-      });
-      // Refresh jobs list after update
-      fetchData();
-    } catch (error) {
-      console.error("Error updating job status:", error);
-    }
-  };
-
   const deleteApplication = async (applicationId) => {
-    try {
-      await axios.delete(`http://localhost:4000/jobapplication/application/${applicationId}`);
-      // Refresh applications after deletion
-      const appsResponse = await axios.get(`http://localhost:4000/jobapplication/user/${userId}`);
-      setApplications(appsResponse.data || []);
-    } catch (error) {
-      console.error("Error deleting application:", error);
+    if (window.confirm('Are you sure you want to withdraw this application?')) {
+      try {
+        await axios.delete(`http://localhost:4000/jobapplication/application/${applicationId}`);
+        const appsResponse = await axios.get(`http://localhost:4000/jobapplication/user/${userId}`);
+        setApplications(appsResponse.data || []);
+        alert('Application withdrawn successfully');
+      } catch (error) {
+        console.error("Error deleting application:", error);
+        alert('Failed to withdraw application');
+      }
     }
   };
 
-  // Logout function
   const handleLogout = () => {
-    // Clear any authentication data
     localStorage.removeItem('token');
     localStorage.removeItem('userRole');
     localStorage.removeItem('userId');
-    
-    // Redirect to login page
     navigate('/login');
   };
-  
+
+  const filteredJobs = jobs.filter(job => 
+    job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    job.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    job.location.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredApplications = applications.filter(app => 
+    app.jobId?.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    app.jobId?.companyName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'dashboard':
         return (
-          <div style={styles.tabContent}>
-            <h2 style={styles.tabTitle}>Dashboard Overview</h2>
-            <div style={styles.statsContainer}>
-              <div style={styles.statCard}>
+          <div className="tab-content">
+            <h2 className="tab-title">Dashboard Overview</h2>
+            <div className="stats-container">
+              <div className="stat-card primary">
                 <h3>Jobs Applied</h3>
-                <p style={styles.statNumber}>{applications.length}</p>
+                <p className="stat-number">{applications.length}</p>
+                <i className="stat-icon fas fa-file-alt"></i>
               </div>
-              <div style={styles.statCard}>
+              <div className="stat-card success">
                 <h3>Active Jobs</h3>
-                <p style={styles.statNumber}>{jobs.length}</p>
+                <p className="stat-number">{jobs.length}</p>
+                <i className="stat-icon fas fa-briefcase"></i>
               </div>
-              <div style={styles.statCard}>
+              <div className="stat-card info">
                 <h3>Profile Views</h3>
-                <p style={styles.statNumber}>{profileViews}</p>
+                <p className="stat-number">{profileViews}</p>
+                <i className="stat-icon fas fa-eye"></i>
+              </div>
+              <div className="stat-card warning">
+                <h3>Pending Applications</h3>
+                <p className="stat-number">{applications.filter(app => app.status === 'Pending').length}</p>
+                <i className="stat-icon fas fa-clock"></i>
               </div>
             </div>
             
-            <h3 style={styles.sectionTitle}>Recent Applications</h3>
-            {applications.length === 0 ? (
-              <p style={styles.noDataText}>No applications yet. Browse jobs to apply.</p>
-            ) : (
-              <div style={styles.applicationsList}>
-                {applications.slice(0, 3).map(app => (
-                  <div key={app._id} style={styles.applicationCard}>
-                    <h4 style={styles.jobTitle}>{app.jobId?.title || 'No title'}</h4>
-                    <p style={styles.companyName}>{app.jobId?.companyName || 'Unknown company'}</p>
-                    <div style={styles.applicationMeta}>
-                      <span>Applied: {new Date(app.appliedDate || Date.now()).toLocaleDateString()}</span>
-                      <span style={styles.statusBadge(app.status)}>{app.status}</span>
-                    </div>
+            <div className="dashboard-sections">
+              <div className="dashboard-section">
+                <h3 className="section-title">Recent Applications</h3>
+                {applications.length === 0 ? (
+                  <p className="no-data-text">No applications yet. Browse jobs to apply.</p>
+                ) : (
+                  <div className="applications-list">
+                    {applications.slice(0, 4).map(app => (
+                      <div key={app._id} className="application-card">
+                        <div className="application-header">
+                          <h4 className="job-title">{app.jobId?.title || 'No title'}</h4>
+                          <span className={`status-badge ${app.status.toLowerCase()}`}>{app.status}</span>
+                        </div>
+                        <p className="company-name">{app.jobId?.companyName || 'Unknown company'}</p>
+                        <div className="application-meta">
+                          <span><i className="fas fa-calendar-alt"></i> {new Date(app.appliedDate || Date.now()).toLocaleDateString()}</span>
+                          <button 
+                            onClick={() => deleteApplication(app._id)} 
+                            className="delete-button small"
+                          >
+                            <i className="fas fa-trash"></i> Withdraw
+                          </button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
               </div>
-            )}
-          </div>
-        );
-      case 'viewJobs':
-        return (
-          <div style={styles.tabContent}>
-            <h2 style={styles.tabTitle}>Available Jobs</h2>
-            {isLoading ? (
-              <div style={styles.loadingContainer}>
-                <p>Loading jobs...</p>
-              </div>
-            ) : jobs.length === 0 ? (
-              <p style={styles.noDataText}>No jobs available at the moment. Please check back later.</p>
-            ) : (
-              <div style={styles.jobList}>
-                {jobs.map(job => (
-                  <div key={job._id} style={styles.jobCard}>
-                    <div style={styles.jobHeader}>
-                      <h3 style={styles.jobTitle}>{job.title || 'No title'}</h3>
-                      <span style={styles.jobSalary}>{job.salaryRange || 'Salary not specified'}</span>
-                    </div>
-                    <p style={styles.companyName}>{job.companyName || 'Unknown company'} • {job.location || 'Location not specified'}</p>
-                    <p style={styles.jobDescription}>{job.jobDescription || 'No description provided'}</p>
-                    <div style={styles.jobFooter}>
-                      <span style={styles.postedDate}>Status: {job.status || 'Unknown'}</span>
-                      <div style={styles.jobActions}>
-                        <button 
-                          onClick={() => deleteJob(job._id)} 
-                          style={styles.deleteButton}
-                        >
-                          Delete
-                        </button>
+              
+              <div className="dashboard-section">
+                <h3 className="section-title">Recommended Jobs</h3>
+                {jobs.length === 0 ? (
+                  <p className="no-data-text">No recommended jobs available.</p>
+                ) : (
+                  <div className="recommended-jobs">
+                    {jobs.slice(0, 3).map(job => (
+                      <div key={job._id} className="job-card small">
+                        <h4 className="job-title">{job.title || 'No title'}</h4>
+                        <p className="company-name">{job.companyName || 'Unknown company'}</p>
+                        <p className="job-location"><i className="fas fa-map-marker-alt"></i> {job.location || 'Location not specified'}</p>
                         <button 
                           onClick={() => applyForJob(job._id)} 
-                          style={styles.applyButton}
+                          className={`apply-button small ${hasApplied(job._id) ? 'applied' : ''}`}
                           disabled={hasApplied(job._id)}
                         >
                           {hasApplied(job._id) ? 'Applied' : 'Apply Now'}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+        
+      case 'viewJobs':
+        return (
+          <div className="tab-content">
+            <div className="tab-header">
+              <h2 className="tab-title">Available Jobs</h2>
+              <div className="search-box">
+                <i className="fas fa-search"></i>
+                <input 
+                  type="text" 
+                  placeholder="Search jobs..." 
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </div>
+            
+            {isLoading ? (
+              <div className="loading-container">
+                <div className="spinner"></div>
+                <p>Loading jobs...</p>
+              </div>
+            ) : filteredJobs.length === 0 ? (
+              <div className="no-data">
+                <i className="fas fa-briefcase no-data-icon"></i>
+                <p>No jobs match your search criteria.</p>
+                <button className="reset-button" onClick={() => setSearchTerm('')}>
+                  Reset Search
+                </button>
+              </div>
+            ) : (
+              <div className="job-list">
+                {filteredJobs.map(job => (
+                  <div key={job._id} className="job-card">
+                    <div className="job-header">
+                      <div>
+                        <h3 className="job-title">{job.title || 'No title'}</h3>
+                        <p className="company-name">
+                          {job.companyName || 'Unknown company'} 
+                          <span className="job-type">{job.jobType || 'Full-time'}</span>
+                        </p>
+                      </div>
+                      <span className="job-salary">
+                        <i className="fas fa-money-bill-wave"></i> {job.salaryRange || 'Salary not specified'}
+                      </span>
+                    </div>
+                    <p className="job-location">
+                      <i className="fas fa-map-marker-alt"></i> {job.location || 'Location not specified'}
+                    </p>
+                    <p className="job-description">
+                      {job.jobDescription?.length > 150 
+                        ? `${job.jobDescription.substring(0, 150)}...` 
+                        : job.jobDescription || 'No description provided'}
+                    </p>
+                    <div className="job-footer">
+                      <div className="job-tags">
+                        {job.skillsRequired?.slice(0, 3).map((skill, index) => (
+                          <span key={index} className="job-tag">{skill}</span>
+                        ))}
+                      </div>
+                      <div className="job-actions">
+                        <button 
+                          onClick={() => applyForJob(job._id)} 
+                          className={`apply-button ${hasApplied(job._id) ? 'applied' : ''}`}
+                          disabled={hasApplied(job._id)}
+                        >
+                          {hasApplied(job._id) ? (
+                            <>
+                              <i className="fas fa-check"></i> Applied
+                            </>
+                          ) : (
+                            <>
+                              <i className="fas fa-paper-plane"></i> Apply Now
+                            </>
+                          )}
                         </button>
                       </div>
                     </div>
@@ -195,394 +269,164 @@ const JobSeekerDashboard = () => {
             )}
           </div>
         );
-        case 'viewApplications':
-          return (
-            <div style={styles.tabContent}>
-              <h2 style={styles.tabTitle}>Your Applications</h2>
-              {applications.length === 0 ? (
-                <p style={styles.noDataText}>You haven't applied to any jobs yet. Browse jobs to apply.</p>
-              ) : (
-                <div style={styles.applicationsTable}>
-                  <div style={styles.tableHeader}>
-                    <span style={styles.headerItem}>Job Title</span>
-                    <span style={styles.headerItem}>Company</span>
-                    <span style={styles.headerItem}>Applied Date</span>
-                    <span style={styles.headerItem}>Status</span>
-                    <span style={styles.headerItem}>Actions</span>
+        
+      case 'viewApplications':
+        return (
+          <div className="tab-content">
+            <div className="tab-header">
+              <h2 className="tab-title">Your Applications</h2>
+              <div className="search-box">
+                <i className="fas fa-search"></i>
+                <input 
+                  type="text" 
+                  placeholder="Search applications..." 
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </div>
+            
+            {applications.length === 0 ? (
+              <div className="no-data">
+                <i className="fas fa-file-alt no-data-icon"></i>
+                <p>You haven't applied to any jobs yet.</p>
+                <button 
+                  className="primary-button" 
+                  onClick={() => setActiveTab('viewJobs')}
+                >
+                  Browse Jobs
+                </button>
+              </div>
+            ) : (
+              <div className="applications-table-container">
+                <div className="applications-table">
+                  <div className="table-header">
+                    <span className="header-item">Job Title</span>
+                    <span className="header-item">Company</span>
+                    <span className="header-item">Applied Date</span>
+                    <span className="header-item">Status</span>
+                    <span className="header-item">Actions</span>
                   </div>
-                  {applications.map(app => (
-                    <div key={app._id} style={styles.tableRow}>
-                      <span style={styles.tableCell}>{app.jobId?.title || 'No title'}</span>
-                      <span style={styles.tableCell}>{app.jobId?.companyName || 'Unknown company'}</span>
-                      <span style={styles.tableCell}>{new Date(app.appliedDate || Date.now()).toLocaleDateString()}</span>
-                      <span style={styles.tableCell}>
-                        <span style={styles.statusBadge(app.status)}>{app.status}</span>
+                  {filteredApplications.map(app => (
+                    <div key={app._id} className="table-row">
+                      <span className="table-cell">
+                        <div className="job-title-cell">
+                          {app.jobId?.title || 'No title'}
+                        </div>
                       </span>
-                      <span style={styles.tableCell}>
+                      <span className="table-cell">
+                        {app.jobId?.companyName || 'Unknown company'}
+                      </span>
+                      <span className="table-cell">
+                        {new Date(app.appliedDate || Date.now()).toLocaleDateString()}
+                      </span>
+                      <span className="table-cell">
+                        <span className={`status-badge ${app.status.toLowerCase()}`}>
+                          {app.status}
+                        </span>
+                      </span>
+                      <span className="table-cell">
                         <button 
                           onClick={() => deleteApplication(app._id)} 
-                          style={styles.deleteButton}
+                          className="delete-button"
+                          title="Withdraw Application"
                         >
-                          Delete
+                          <i className="fas fa-trash"></i>
                         </button>
                       </span>
                     </div>
                   ))}
                 </div>
-              )}
-            </div>
-          );
+              </div>
+            )}
+          </div>
+        );
+        
       default:
         return null;
     }
   };
 
   return (
-    <div style={styles.dashboardContainer}>
-      <div style={styles.sidebar}>
-        <h1 style={styles.logo}>JobFinder</h1>
-        <nav style={styles.nav}>
+    <div className="dashboard-container">
+      <div className="sidebar">
+        <div className="sidebar-header">
+          <h1 className="logo">
+            <i className="fas fa-briefcase logo-icon"></i>
+            JobConnect
+          </h1>
+          {/* <div className="user-profile">
+            <div className="profile-avatar">JS</div>
+            <div className="profile-info">
+              <p className="profile-name">Job Seeker</p>
+              <p className="profile-email">user@example.com</p>
+            </div>
+          </div> */}
+        </div>
+        
+        <nav className="nav-menu">
           <button 
             onClick={() => setActiveTab('dashboard')} 
-            style={activeTab === 'dashboard' ? styles.activeNavButton : styles.navButton}
+            className={`nav-button ${activeTab === 'dashboard' ? 'active' : ''}`}
           >
-            Dashboard Overview
+            <i className="fas fa-tachometer-alt"></i>
+            Dashboard
           </button>
           <button 
             onClick={() => setActiveTab('viewJobs')} 
-            style={activeTab === 'viewJobs' ? styles.activeNavButton : styles.navButton}
+            className={`nav-button ${activeTab === 'viewJobs' ? 'active' : ''}`}
           >
-            View Jobs
+            <i className="fas fa-search"></i>
+            Browse Jobs
           </button>
           <button 
             onClick={() => setActiveTab('viewApplications')} 
-            style={activeTab === 'viewApplications' ? styles.activeNavButton : styles.navButton}
+            className={`nav-button ${activeTab === 'viewApplications' ? 'active' : ''}`}
           >
-            View Applications
+            <i className="fas fa-file-alt"></i>
+            My Applications
+          </button>
+          <button 
+            onClick={() => setActiveTab('savedJobs')} 
+            className={`nav-button ${activeTab === 'savedJobs' ? 'active' : ''}`}
+            disabled
+            title="Coming Soon"
+          >
+            <i className="fas fa-bookmark"></i>
+            Saved Jobs
           </button>
         </nav>
-        <div style={styles.profileSection}>
-          <div style={styles.profileIcon}>JS</div>
-          <div>
-            <p style={styles.profileName}>Job Seeker</p>
-            <button 
-              onClick={handleLogout} 
-              style={styles.logoutButton}
-            >
-              Logout
-            </button>
-          </div>
+        
+        <div className="sidebar-footer">
+          <button 
+            onClick={handleLogout} 
+            className="logout-button"
+          >
+            <i className="fas fa-sign-out-alt"></i>
+            Logout
+          </button>
+          <div className="app-version">v1.0.0</div>
         </div>
       </div>
-      <div style={styles.mainContent}>
+      
+      <div className="main-content">
+        <div className="top-bar">
+          <div className="breadcrumbs">
+            <span>Dashboard</span>
+            {activeTab !== 'dashboard' && <span>{activeTab === 'viewJobs' ? 'Browse Jobs' : 'My Applications'}</span>}
+          </div>
+          {/* <div className="notifications">
+            <button className="notification-button">
+              <i className="fas fa-bell"></i>
+              <span className="notification-badge">3</span>
+            </button>
+          </div> */}
+        </div>
+        
         {renderTabContent()}
       </div>
     </div>
   );
-};
-
-// CSS styles
-const styles = {
-  dashboardContainer: {
-    display: 'flex',
-    minHeight: '100vh',
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-    backgroundColor: '#f5f7fa'
-  },
-  sidebar: {
-    width: '250px',
-    backgroundColor: '#34495e',
-    color: 'white',
-    padding: '20px',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between'
-  },
-  logo: {
-    fontSize: '22px',
-    marginBottom: '40px',
-    color: '#1abc9c',
-    textAlign: 'center'
-  },
-  nav: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px'
-  },
-  navButton: {
-    padding: '12px 15px',
-    backgroundColor: 'transparent',
-    border: 'none',
-    color: 'white',
-    textAlign: 'left',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    fontSize: '15px',
-    transition: 'all 0.3s',
-    ':hover': {
-      backgroundColor: '#2c3e50'
-    }
-  },
-  activeNavButton: {
-    padding: '12px 15px',
-    backgroundColor: '#1abc9c',
-    border: 'none',
-    color: 'white',
-    textAlign: 'left',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    fontSize: '15px',
-    fontWeight: '600',
-    boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
-  },
-  profileSection: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    marginTop: 'auto',
-    paddingTop: '20px',
-    borderTop: '1px solid #2c3e50'
-  },
-  profileIcon: {
-    width: '40px',
-    height: '40px',
-    borderRadius: '50%',
-    backgroundColor: '#1abc9c',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontWeight: 'bold',
-    fontSize: '16px'
-  },
-  profileName: {
-    margin: '0',
-    fontSize: '14px',
-    fontWeight: '500'
-  },
-  logoutButton: {
-    padding: '5px 10px',
-    backgroundColor: 'transparent',
-    border: '1px solid #e74c3c',
-    color: '#e74c3c',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontSize: '12px',
-    transition: 'all 0.3s',
-    marginTop: '5px',
-    ':hover': {
-      backgroundColor: '#e74c3c',
-      color: 'white'
-    }
-  },
-  mainContent: {
-    flex: '1',
-    padding: '30px',
-    backgroundColor: 'white',
-    boxShadow: '0 0 15px rgba(0,0,0,0.05)'
-  },
-  tabContent: {
-    maxWidth: '1200px',
-    margin: '0 auto'
-  },
-  tabTitle: {
-    color: '#2c3e50',
-    marginBottom: '25px',
-    fontSize: '24px',
-    fontWeight: '600'
-  },
-  statsContainer: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-    gap: '20px',
-    marginBottom: '30px'
-  },
-  statCard: {
-    backgroundColor: '#f8f9fa',
-    padding: '20px',
-    borderRadius: '8px',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-    textAlign: 'center',
-    transition: 'transform 0.3s',
-    ':hover': {
-      transform: 'translateY(-3px)',
-      boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-    }
-  },
-  statNumber: {
-    fontSize: '28px',
-    fontWeight: '700',
-    color: '#1abc9c',
-    margin: '10px 0 0'
-  },
-  sectionTitle: {
-    color: '#2c3e50',
-    margin: '30px 0 15px',
-    fontSize: '18px',
-    fontWeight: '600'
-  },
-  jobList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px'
-  },
-  jobCard: {
-    backgroundColor: '#f8f9fa',
-    padding: '20px',
-    borderRadius: '8px',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-    transition: 'all 0.3s',
-    ':hover': {
-      transform: 'translateY(-3px)',
-      boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-    }
-  },
-  jobHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '10px'
-  },
-  jobTitle: {
-    margin: '0',
-    color: '#2c3e50',
-    fontSize: '18px',
-    fontWeight: '600'
-  },
-  jobSalary: {
-    color: '#1abc9c',
-    fontWeight: '600',
-    fontSize: '15px'
-  },
-  companyName: {
-    margin: '0 0 15px',
-    color: '#7f8c8d',
-    fontSize: '15px'
-  },
-  jobDescription: {
-    margin: '0 0 15px',
-    color: '#34495e',
-    fontSize: '15px',
-    lineHeight: '1.5'
-  },
-  postedDate: {
-    color: '#95a5a6',
-    fontSize: '13px'
-  },
-  applyButton: {
-    padding: '8px 20px',
-    backgroundColor: '#1abc9c',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    fontWeight: '600',
-    transition: 'all 0.3s',
-    ':hover': {
-      backgroundColor: '#16a085'
-    },
-    ':disabled': {
-      backgroundColor: '#bdc3c7',
-      cursor: 'not-allowed'
-    }
-  },
-  applicationsList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '15px'
-  },
-  applicationCard: {
-    backgroundColor: '#f8f9fa',
-    padding: '15px',
-    borderRadius: '6px',
-    borderLeft: '4px solid #1abc9c'
-  },
-  applicationMeta: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginTop: '10px',
-    fontSize: '14px',
-    color: '#7f8c8d'
-  },
-  statusBadge: (status) => ({
-    padding: '4px 10px',
-    borderRadius: '12px',
-    fontSize: '12px',
-    fontWeight: '600',
-    backgroundColor: status === 'Pending' ? '#f39c12' : 
-                   status === 'Reviewed' ? '#3498db' : 
-                   status === 'Rejected' ? '#e74c3c' : '#2ecc71',
-    color: 'white'
-  }),
-  applicationsTable: {
-    border: '1px solid #ecf0f1',
-    borderRadius: '8px',
-    overflow: 'hidden'
-  },
-  tableHeader: {
-    display: 'grid',
-    gridTemplateColumns: '2fr 2fr 1fr 1fr 1fr',
-    backgroundColor: '#34495e',
-    color: 'white',
-    padding: '12px 15px',
-    fontWeight: '600',
-    fontSize: '14px'
-  },
-  tableRow: {
-    display: 'grid',
-    gridTemplateColumns: '2fr 2fr 1fr 1fr 1fr',
-    padding: '12px 15px',
-    borderBottom: '1px solid #ecf0f1',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    transition: 'background-color 0.2s',
-    ':hover': {
-      backgroundColor: '#f8f9fa'
-    }
-  },
-  headerItem: {
-    fontSize: '14px'
-  },
-  tableCell: {
-    fontSize: '14px'
-  },
-  noDataText: {
-    color: '#7f8c8d',
-    textAlign: 'center',
-    padding: '20px'
-  },
-  loadingContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '200px'
-  },
-  jobFooter: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: '10px'
-  },
-  jobActions: {
-    display: 'flex',
-    gap: '10px',
-    alignItems: 'center'
-  },
-  deleteButton: {
-    padding: '6px 12px',
-    backgroundColor: '#e74c3c',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    fontSize: '13px',
-    fontWeight: '600',
-    transition: 'all 0.3s',
-    ':hover': {
-      backgroundColor: '#c0392b'
-    }
-  },
 };
 
 export default JobSeekerDashboard;
