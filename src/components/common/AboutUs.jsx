@@ -63,7 +63,7 @@ const AboutUs = () => {
         </div>
       </section>
 
-      {/* Team Section */}
+      {/* Team Section
       <section className="team-section">
         <h2>Our Team</h2>
         <div className="team-grid">
@@ -83,7 +83,7 @@ const AboutUs = () => {
             <p>CTO</p>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Testimonials Section */}
       <section className="testimonials-section">

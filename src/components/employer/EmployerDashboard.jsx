@@ -8,6 +8,7 @@ const JobProviderDashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedJobId, setSelectedJobId] = useState(null);
+  const [editingJob, setEditingJob] = useState(null);
   const [newJob, setNewJob] = useState({
     companyName: '',
     title: '',
@@ -26,18 +27,11 @@ const JobProviderDashboard = () => {
 
   const fetchJobs = async () => {
     setIsLoading(true);
-    setError(null);
     try {
       const response = await axios.get('http://localhost:4000/job/getjob');
-      // Ensure applicationCount is properly set from either applicationCount field or applications array length
-      const jobsWithCounts = response.data.data.map(job => ({
-        ...job,
-        applicationCount: job.applications ? job.applications.length : job.applicationCount || 0
-      }));
-      setJobs(jobsWithCounts);
+      setJobs(response.data.data);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch jobs');
-      console.error('Error fetching jobs:', err);
     } finally {
       setIsLoading(false);
     }
@@ -45,24 +39,13 @@ const JobProviderDashboard = () => {
 
   const fetchApplicants = async (jobId) => {
     setIsLoading(true);
-    setError(null);
     try {
-      const response = await axios.get(`http://localhost:4000/jobapplication/job/${jobId}`);
-      setApplicants(response.data || []);
+      const response = await axios.get(`http://localhost:4000/job/${jobId}/applications`);
+      setApplicants(response.data.data.applications || []);
       setSelectedJobId(jobId);
       setActiveTab('viewApplicants');
-      
-      // Update the specific job's application count in the jobs state
-      setJobs(prevJobs => 
-        prevJobs.map(job => 
-          job._id === jobId 
-            ? { ...job, applicationCount: response.data.length } 
-            : job
-        )
-      );
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch applicants');
-      console.error('Error fetching applicants:', err);
     } finally {
       setIsLoading(false);
     }
@@ -70,10 +53,17 @@ const JobProviderDashboard = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewJob(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    if (editingJob) {
+      setEditingJob(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    } else {
+      setNewJob(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
   const handleAddJob = async (e) => {
@@ -85,9 +75,14 @@ const JobProviderDashboard = () => {
       if (!newJob.companyName || !newJob.title || !newJob.jobDescription || !newJob.location || !newJob.salaryRange) {
         throw new Error('Please fill all required fields');
       }
-  
-      const response = await axios.post('http://localhost:4000/job/addjob', newJob);
-  
+
+      const jobData = {
+        ...newJob,
+        employerId: "680062bfd0afc78d7ad930d2" // Replace with actual employer ID
+      };
+
+      const response = await axios.post('http://localhost:4000/job/addjob', jobData);
+
       setJobs(prevJobs => [...prevJobs, { ...response.data.data, applicationCount: 0 }]);
       setNewJob({
         companyName: '',
@@ -105,6 +100,55 @@ const JobProviderDashboard = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleUpdateJob = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      if (!editingJob.companyName || !editingJob.title || !editingJob.jobDescription || 
+          !editingJob.location || !editingJob.salaryRange) {
+        throw new Error('Please fill all required fields');
+      }
+  
+      const response = await axios.put(
+        `http://localhost:4000/job/${editingJob._id}`,
+        editingJob
+      );
+  
+      setJobs(prevJobs => 
+        prevJobs.map(job => 
+          job._id === editingJob._id ? { ...response.data.data, applicationCount: job.applicationCount } : job
+        )
+      );
+      setEditingJob(null);
+      setActiveTab('viewJobs');
+    } catch (err) {
+      setError(err.message || 'Failed to update job');
+      console.error('Error updating job:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const handleDeleteJob = async (jobId) => {
+    if (!window.confirm('Are you sure you want to delete this job?')) return;
+    
+    setIsLoading(true);
+    try {
+      await axios.delete(`http://localhost:4000/job/${jobId}`);
+      setJobs(prevJobs => prevJobs.filter(job => job._id !== jobId));
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to delete job');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const startEditingJob = (job) => {
+    setEditingJob({ ...job });
+    setActiveTab('editJob');
   };
 
   const updateApplicationStatus = async (applicationId, newStatus) => {
@@ -151,7 +195,7 @@ const JobProviderDashboard = () => {
             <h2 style={styles.tabTitle}>Add New Job</h2>
             {error && <div style={styles.errorMessage}>{error}</div>}
             <form onSubmit={handleAddJob} style={styles.jobForm}>
-              <div style={styles.formGroup}>
+            <div style={styles.formGroup}>
                 <label style={styles.label}>Company Name*</label>
                 <input
                   type="text"
@@ -260,6 +304,133 @@ const JobProviderDashboard = () => {
             </form>
           </div>
         );
+      case 'editJob':
+        return (
+          <div style={styles.tabContent}>
+            <h2 style={styles.tabTitle}>Edit Job</h2>
+            {error && <div style={styles.errorMessage}>{error}</div>}
+            <form onSubmit={handleUpdateJob} style={styles.jobForm}>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Company Name*</label>
+                <input
+                  type="text"
+                  name="companyName"
+                  value={editingJob.companyName}
+                  onChange={handleInputChange}
+                  style={styles.input}
+                  required
+                  placeholder="Enter company name"
+                />
+              </div>
+              
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Job Title*</label>
+                <input
+                  type="text"
+                  name="title"
+                  value={editingJob.title}
+                  onChange={handleInputChange}
+                  style={styles.input}
+                  required
+                  placeholder="Enter job title"
+                />
+              </div>
+              
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Job Description*</label>
+                <textarea
+                  name="jobDescription"
+                  value={editingJob.jobDescription}
+                  onChange={handleInputChange}
+                  style={{ ...styles.input, height: '120px' }}
+                  required
+                  placeholder="Enter detailed job description"
+                />
+              </div>
+              
+              <div style={styles.formRow}>
+                <div style={{ ...styles.formGroup, flex: 1 }}>
+                  <label style={styles.label}>Location*</label>
+                  <input
+                    type="text"
+                    name="location"
+                    value={editingJob.location}
+                    onChange={handleInputChange}
+                    style={styles.input}
+                    required
+                    placeholder="e.g. New York"
+                  />
+                </div>
+                
+                <div style={{ ...styles.formGroup, flex: 1 }}>
+                  <label style={styles.label}>Salary Range*</label>
+                  <input
+                    type="text"
+                    name="salaryRange"
+                    value={editingJob.salaryRange}
+                    onChange={handleInputChange}
+                    style={styles.input}
+                    required
+                    placeholder="e.g. $50,000 - $70,000"
+                  />
+                </div>
+              </div>
+              
+              <div style={styles.formRow}>
+                <div style={{ ...styles.formGroup, flex: 1 }}>
+                  <label style={styles.label}>Status*</label>
+                  <select
+                    name="status"
+                    value={editingJob.status}
+                    onChange={handleInputChange}
+                    style={styles.input}
+                    required
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Closed">Closed</option>
+                    <option value="Draft">Draft</option>
+                  </select>
+                </div>
+                
+                <div style={{ ...styles.formGroup, flex: 1 }}>
+                  <label style={styles.label}>Employment Type*</label>
+                  <select
+                    name="employmentType"
+                    value={editingJob.employmentType}
+                    onChange={handleInputChange}
+                    style={styles.input}
+                    required
+                  >
+                    <option value="Full-Time">Full-Time</option>
+                    <option value="Part-Time">Part-Time</option>
+                    <option value="Contract">Contract</option>
+                    <option value="Seasonal">Seasonal</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div style={styles.formRow}>
+                <button 
+                  type="submit" 
+                  style={styles.submitButton}
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Updating...' : 'Update Job'}
+                </button>
+                <button 
+                  type="button" 
+                  style={{...styles.submitButton, backgroundColor: '#95a5a6'}}
+                  onClick={() => {
+                    setEditingJob(null);
+                    setActiveTab('viewJobs');
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        );
       case 'viewJobs':
         return (
           <div style={styles.tabContent}>
@@ -287,12 +458,26 @@ const JobProviderDashboard = () => {
                     <p style={styles.jobDescription}>{job.jobDescription}</p>
                     <div style={styles.jobFooter}>
                       <span>Applicants: {job.applicationCount || 0}</span>
-                      <button 
-                        onClick={() => fetchApplicants(job._id)} 
-                        style={styles.viewApplicantsButton}
-                      >
-                        View Applicants
-                      </button>
+                      <div style={styles.jobActions}>
+                        <button 
+                          onClick={() => fetchApplicants(job._id)} 
+                          style={styles.viewApplicantsButton}
+                        >
+                          Applicants
+                        </button>
+                        <button 
+                          onClick={() => startEditingJob(job)} 
+                          style={styles.editButton}
+                        >
+                          Edit
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteJob(job._id)} 
+                          style={styles.deleteButton}
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -404,6 +589,36 @@ const JobProviderDashboard = () => {
 };
 
 const styles = {
+  jobActions: {
+    display: 'flex',
+    gap: '8px'
+  },
+  editButton: {
+    padding: '8px 15px',
+    backgroundColor: '#3498db',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    transition: 'background-color 0.3s',
+    ':hover': {
+      backgroundColor: '#2980b9'
+    }
+  },
+  deleteButton: {
+    padding: '8px 15px',
+    backgroundColor: '#e74c3c',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    transition: 'background-color 0.3s',
+    ':hover': {
+      backgroundColor: '#c0392b'
+    }
+  },
   dashboardContainer: {
     display: 'flex',
     minHeight: '100vh',

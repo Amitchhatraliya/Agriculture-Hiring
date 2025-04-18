@@ -57,11 +57,47 @@ const JobSeekerDashboard = () => {
   // Helper function to check if user has applied to a job
   const hasApplied = (jobId) => {
     return applications.some(app => {
+      if (!app.jobId) return false;
       const appliedJobId = typeof app.jobId === 'object' ? app.jobId._id : app.jobId;
       return appliedJobId === jobId;
     });
   };
 
+   // Delete job function
+   const deleteJob = async (jobId) => {
+    try {
+      await axios.delete(`http://localhost:4000/job/${jobId}`);
+      // Refresh jobs list after deletion
+      fetchData();
+    } catch (error) {
+      console.error("Error deleting job:", error);
+    }
+  };
+
+  // Update job status function
+  const updateJobStatus = async (jobId, newStatus) => {
+    try {
+      await axios.patch(`http://localhost:4000/job/${jobId}`, {
+        status: newStatus
+      });
+      // Refresh jobs list after update
+      fetchData();
+    } catch (error) {
+      console.error("Error updating job status:", error);
+    }
+  };
+
+  const deleteApplication = async (applicationId) => {
+    try {
+      await axios.delete(`http://localhost:4000/jobapplication/application/${applicationId}`);
+      // Refresh applications after deletion
+      const appsResponse = await axios.get(`http://localhost:4000/jobapplication/user/${userId}`);
+      setApplications(appsResponse.data || []);
+    } catch (error) {
+      console.error("Error deleting application:", error);
+    }
+  };
+  
   const renderTabContent = () => {
     switch (activeTab) {
       case 'dashboard':
@@ -124,13 +160,30 @@ const JobSeekerDashboard = () => {
                     <p style={styles.jobDescription}>{job.jobDescription || 'No description provided'}</p>
                     <div style={styles.jobFooter}>
                       <span style={styles.postedDate}>Status: {job.status || 'Unknown'}</span>
-                      <button 
-                        onClick={() => applyForJob(job._id)} 
-                        style={styles.applyButton}
-                        disabled={hasApplied(job._id)}
-                      >
-                        {hasApplied(job._id) ? 'Applied' : 'Apply Now'}
-                      </button>
+                      <div style={styles.jobActions}>
+                        {/* <select 
+                          value={job.status}
+                          onChange={(e) => updateJobStatus(job._id, e.target.value)}
+                          style={styles.statusSelect}
+                        >
+                          <option value="Open">Open</option>
+                          <option value="Closed">Closed</option>
+                          <option value="On Hold">On Hold</option>
+                        </select> */}
+                        <button 
+                          onClick={() => deleteJob(job._id)} 
+                          style={styles.deleteButton}
+                        >
+                          Delete
+                        </button>
+                        <button 
+                          onClick={() => applyForJob(job._id)} 
+                          style={styles.applyButton}
+                          disabled={hasApplied(job._id)}
+                        >
+                          {hasApplied(job._id) ? 'Applied' : 'Apply Now'}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -138,34 +191,43 @@ const JobSeekerDashboard = () => {
             )}
           </div>
         );
-      case 'viewApplications':
-        return (
-          <div style={styles.tabContent}>
-            <h2 style={styles.tabTitle}>Your Applications</h2>
-            {applications.length === 0 ? (
-              <p style={styles.noDataText}>You haven't applied to any jobs yet. Browse jobs to apply.</p>
-            ) : (
-              <div style={styles.applicationsTable}>
-                <div style={styles.tableHeader}>
-                  <span style={styles.headerItem}>Job Title</span>
-                  <span style={styles.headerItem}>Company</span>
-                  <span style={styles.headerItem}>Applied Date</span>
-                  <span style={styles.headerItem}>Status</span>
-                </div>
-                {applications.map(app => (
-                  <div key={app._id} style={styles.tableRow}>
-                    <span style={styles.tableCell}>{app.jobId?.title || 'No title'}</span>
-                    <span style={styles.tableCell}>{app.jobId?.companyName || 'Unknown company'}</span>
-                    <span style={styles.tableCell}>{new Date(app.appliedDate || Date.now()).toLocaleDateString()}</span>
-                    <span style={styles.tableCell}>
-                      <span style={styles.statusBadge(app.status)}>{app.status}</span>
-                    </span>
+        case 'viewApplications':
+          return (
+            <div style={styles.tabContent}>
+              <h2 style={styles.tabTitle}>Your Applications</h2>
+              {applications.length === 0 ? (
+                <p style={styles.noDataText}>You haven't applied to any jobs yet. Browse jobs to apply.</p>
+              ) : (
+                <div style={styles.applicationsTable}>
+                  <div style={styles.tableHeader}>
+                    <span style={styles.headerItem}>Job Title</span>
+                    <span style={styles.headerItem}>Company</span>
+                    <span style={styles.headerItem}>Applied Date</span>
+                    <span style={styles.headerItem}>Status</span>
+                    <span style={styles.headerItem}>Actions</span>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        );
+                  {applications.map(app => (
+                    <div key={app._id} style={styles.tableRow}>
+                      <span style={styles.tableCell}>{app.jobId?.title || 'No title'}</span>
+                      <span style={styles.tableCell}>{app.jobId?.companyName || 'Unknown company'}</span>
+                      <span style={styles.tableCell}>{new Date(app.appliedDate || Date.now()).toLocaleDateString()}</span>
+                      <span style={styles.tableCell}>
+                        <span style={styles.statusBadge(app.status)}>{app.status}</span>
+                      </span>
+                      <span style={styles.tableCell}>
+                        <button 
+                          onClick={() => deleteApplication(app._id)} 
+                          style={styles.deleteButton}
+                        >
+                          Delete
+                        </button>
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
       default:
         return null;
     }
@@ -375,11 +437,11 @@ const styles = {
     fontSize: '15px',
     lineHeight: '1.5'
   },
-  jobFooter: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center'
-  },
+  // jobFooter: {
+  //   display: 'flex',
+  //   justifyContent: 'space-between',
+  //   alignItems: 'center'
+  // },
   postedDate: {
     color: '#95a5a6',
     fontSize: '13px'
@@ -437,7 +499,7 @@ const styles = {
   },
   tableHeader: {
     display: 'grid',
-    gridTemplateColumns: '2fr 2fr 1fr 1fr',
+    gridTemplateColumns: '2fr 2fr 1fr 1fr 1fr', // Added one more column
     backgroundColor: '#34495e',
     color: 'white',
     padding: '12px 15px',
@@ -446,7 +508,7 @@ const styles = {
   },
   tableRow: {
     display: 'grid',
-    gridTemplateColumns: '2fr 2fr 1fr 1fr',
+    gridTemplateColumns: '2fr 2fr 1fr 1fr 1fr', // Added one more column
     padding: '12px 15px',
     borderBottom: '1px solid #ecf0f1',
     alignItems: 'center',
@@ -472,7 +534,40 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
     height: '200px'
-  }
+  },
+  jobFooter: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: '10px'
+  },
+  jobActions: {
+    display: 'flex',
+    gap: '10px',
+    alignItems: 'center'
+  },
+  statusSelect: {
+    padding: '6px 10px',
+    borderRadius: '5px',
+    border: '1px solid #ddd',
+    backgroundColor: '#f8f9fa',
+    cursor: 'pointer'
+  },
+  deleteButton: {
+    padding: '6px 12px', // Smaller padding for table
+    backgroundColor: '#e74c3c',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    fontSize: '13px', // Smaller font size
+    fontWeight: '600',
+    transition: 'all 0.3s',
+    ':hover': {
+      backgroundColor: '#c0392b'
+    }
+  },
 };
 
 export default JobSeekerDashboard;
