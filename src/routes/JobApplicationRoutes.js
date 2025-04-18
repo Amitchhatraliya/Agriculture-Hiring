@@ -13,4 +13,8 @@ routes.get('/user/:userId', applicationController.getApplicationsByUser);
 // Update application status
 routes.patch('/:id', applicationController.updateApplicationStatus);
 
+routes.put('/application/:id', applicationController.updateApplication); // general update
+routes.delete('/application/:id', applicationController.deleteApplication);
+
+
 module.exports = routes;

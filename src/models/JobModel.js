@@ -1,67 +1,50 @@
+// models/JobModel.js
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
 
-const jobSchema = new Schema({
-    companyName:{
-        type: String,
-        required: true,
-        // unique: true,
-    },
-    
-    title:{
-        type: String,
-        required: true,
-        // unique: true,
-    },
-    // postedby:{
-    //     type: String,
-    //     required: true,
-    // },
-    employementType: {
-        type: String,
-        enum: ['Seasonal', 'Contract', 'Part-Time', 'Full-Time'],
-        default:"Full-Time",
-        required: true
-    },
-    
-    // employementType:{
-    //     type: String,
-    //     required: true,
-    //     unique: true,
-    // },
-    salaryRange:{
-        type: String,
-        required: true,
-        // unique: true,
-    },
-    jobDescription:{
-        type: String,
-        required: true,
-        // unique: true,
-    },
-    status: {
-        type: String,
-        enum: ['Active', 'Inactive', 'Draft'],
-        default: 'Active'
-    },
-    
-    location:{
-        type: String,
-        // unique: true,
-    },
-    stateId:{
-        type: Schema.Types.ObjectId,
-        ref: "State",
-    },
-    // companyId:{
-    //     type: Schema.Types.ObjectId,
-    //     ref: "Company",
-    // },
-    cityId:{
-        type: Schema.Types.ObjectId,
-        ref: "City",
-    },
-},{
-    timestamps: true
-})
-module.exports = mongoose.model('Job', jobSchema);
+const JobSchema = new mongoose.Schema({
+  employerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  companyName: {
+    type: String,
+    required: true
+  },
+  title: {
+    type: String,
+    required: true
+  },
+  jobDescription: {
+    type: String,
+    required: true
+  },
+  location: {
+    type: String,
+    required: true
+  },
+  salaryRange: {
+    type: String,
+    required: true
+  },
+  status: {
+    type: String,
+    enum: ['Active', 'Closed', 'Draft'],
+    default: 'Active'
+  },
+  employmentType: {
+    type: String,
+    enum: ['Full-Time', 'Part-Time', 'Contract', 'Seasonal'],
+    default: 'Full-Time'
+  },
+  applicationCount: {
+    type: Number,
+    default: 0
+  },
+  applications: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Application'
+  }]
+}, { timestamps: true });
+
+module.exports = mongoose.model('Job', JobSchema);
