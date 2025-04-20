@@ -646,7 +646,7 @@ const JobProviderDashboard = () => {
           <h1 className="logo">
             <i className="fas fa-handshake"></i> JobConnect
           </h1>
-          <p className="role-badge">Job Provider</p>
+          {/* <p className="role-badge">Job Provider</p> */}
         </div>
         
         <nav className="nav-menu">
@@ -678,7 +678,7 @@ const JobProviderDashboard = () => {
         </nav>
         
         <div className="profile-section">
-          <div className="profile-info">
+          {/* <div className="profile-info">
             <div className="profile-icon">
               <i className="fas fa-user-tie"></i>
             </div>
@@ -686,7 +686,7 @@ const JobProviderDashboard = () => {
               <p className="profile-name">Job Provider</p>
               <p className="profile-email">provider@jobconnect.com</p>
             </div>
-          </div>
+          </div> */}
           <button 
             onClick={handleLogout} 
             className="logout-button"
