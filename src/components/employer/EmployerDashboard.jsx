@@ -179,68 +179,126 @@ const JobProviderDashboard = () => {
   const renderTabContent = () => {
     switch (activeTab) {
       case 'dashboard':
-        return (
-          <div className="tab-content">
-            <h2 className="tab-title">Dashboard Overview</h2>
-            <div className="stats-container">
-              <div className="stat-card">
-                <div className="stat-icon">
-                  <i className="fas fa-briefcase"></i>
-                </div>
-                <h3>Total Jobs Posted</h3>
-                <p className="stat-number">{jobs.length}</p>
-              </div>
-              <div className="stat-card">
-                <div className="stat-icon">
-                  <i className="fas fa-users"></i>
-                </div>
-                <h3>Total Applicants</h3>
-                <p className="stat-number">
-                  {jobs.reduce((total, job) => total + (job.applicationCount || 0), 0)}
-                </p>
-              </div>
-              <div className="stat-card">
-                <div className="stat-icon">
-                  <i className="fas fa-check-circle"></i>
-                </div>
-                <h3>Active Listings</h3>
-                <p className="stat-number">
-                  {jobs.filter(job => job.status === 'Active').length}
-                </p>
-              </div>
-              <div className="stat-card">
-                <div className="stat-icon">
-                  <i className="fas fa-chart-line"></i>
-                </div>
-                <h3>Recent Activity</h3>
-                <p className="stat-number">
-                  {jobs.length > 0 ? 'Active' : 'None'}
-                </p>
-              </div>
+  return (
+    <div className="tab-content">
+      <div className="dashboard-header">
+        <h1 className="dashboard-title">
+          <i className="fas fa-tachometer-alt"></i> Dashboard Overview
+        </h1>
+        <div className="dashboard-actions">
+          <button 
+            onClick={() => setActiveTab('addJob')} 
+            className="btn btn-primary"
+          >
+            <i className="fas fa-plus"></i> Post New Job
+          </button>
+          <button 
+            onClick={() => setActiveTab('viewJobs')} 
+            className="btn btn-secondary"
+          >
+            <i className="fas fa-briefcase"></i> View All Jobs
+          </button>
+        </div>
+      </div>
+      
+      <div className="stats-container">
+        <div className="stat-card">
+          <div className="stat-icon">
+            <i className="fas fa-briefcase"></i>
+          </div>
+          <h3>Total Jobs Posted</h3>
+          <p className="stat-number">{jobs.length}</p>
+        </div>
+        <div className="stat-card">
+          <div className="stat-icon">
+            <i className="fas fa-users"></i>
+          </div>
+          <h3>Total Applicants</h3>
+          <p className="stat-number">
+            {jobs.reduce((total, job) => total + (job.applicationCount || 0), 0)}
+          </p>
+        </div>
+        <div className="stat-card">
+          <div className="stat-icon">
+            <i className="fas fa-check-circle"></i>
+          </div>
+          <h3>Active Listings</h3>
+          <p className="stat-number">
+            {jobs.filter(job => job.status === 'Active').length}
+          </p>
+        </div>
+        <div className="stat-card">
+          <div className="stat-icon">
+            <i className="fas fa-chart-line"></i>
+          </div>
+          <h3>Performance</h3>
+          <p className="stat-number">
+            {jobs.length > 0 ? 'Good' : 'N/A'}
+          </p>
+        </div>
+      </div>
+      
+      <div className="recent-jobs-section">
+        <h3><i className="fas fa-clock"></i> Recent Job Postings</h3>
+        {jobs.slice(0, 3).map(job => (
+          <div key={job._id} className="job-card">
+            <div className="job-card-header">
+              <h3 className="job-title">{job.title}</h3>
+              <span className={`job-status status-${job.status.toLowerCase()}`}>
+                {job.status}
+              </span>
             </div>
-            
-            <div className="recent-jobs-section">
-              <h3>Recent Job Postings</h3>
-              {jobs.slice(0, 3).map(job => (
-                <div key={job._id} className="recent-job-card">
-                  <div className="recent-job-header">
-                    <h4>{job.title}</h4>
-                    <span className={`job-status status-${job.status.toLowerCase()}`}>
-                      {job.status}
-                    </span>
-                  </div>
-                  <p className="recent-job-company">{job.companyName}</p>
-                  <div className="recent-job-meta">
-                    <span><i className="fas fa-map-marker-alt"></i> {job.location}</span>
-                    <span><i className="fas fa-clock"></i> {job.employmentType}</span>
-                    <span><i className="fas fa-money-bill-wave"></i> {job.salaryRange}</span>
-                  </div>
-                </div>
-              ))}
-              {jobs.length === 0 && <p className="no-data">No recent job postings</p>}
+            <p className="job-company">
+              <i className="fas fa-building"></i> {job.companyName}
+            </p>
+            <div className="job-meta">
+              <span><i className="fas fa-map-marker-alt"></i> {job.location}</span>
+              <span><i className="fas fa-clock"></i> {job.employmentType}</span>
+              <span><i className="fas fa-money-bill-wave"></i> {job.salaryRange}</span>
+            </div>
+            <p className="job-description">{job.jobDescription}</p>
+            <div className="job-footer">
+              <span className="applicants-count">
+                <i className="fas fa-users"></i> {job.applicationCount || 0} Applicants
+              </span>
+              <div className="job-actions">
+  <button 
+    onClick={() => fetchApplicants(job._id)} 
+    className="btn btn-view-applicants"
+  >
+    View Applicants
+  </button>
+  <button 
+    onClick={() => startEditingJob(job)} 
+    className="btn btn-edit"
+  >
+    Edit
+  </button>
+  <button 
+    onClick={() => handleDeleteJob(job._id)} 
+    className="btn btn-delete"
+  >
+    Delete
+  </button>
+</div>
             </div>
           </div>
-        );
+        ))}
+        {jobs.length === 0 && (
+          <div className="no-jobs">
+            <i className="fas fa-briefcase"></i>
+            <p>No recent job postings</p>
+            <button 
+              onClick={() => setActiveTab('addJob')} 
+              className="btn btn-primary"
+            >
+              Post Your First Job
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
       
       case 'addJob':
         return (
@@ -545,7 +603,7 @@ const JobProviderDashboard = () => {
                           onClick={() => fetchApplicants(job._id)} 
                           className="btn btn-view-applicants"
                         >
-                          <i className="fas fa-user-friends"></i> View Applicants
+                          <i className="fas fa-user-friends"></i> View 
                         </button>
                         <button 
                           onClick={() => startEditingJob(job)} 
@@ -646,7 +704,6 @@ const JobProviderDashboard = () => {
           <h1 className="logo">
             <i className="fas fa-handshake"></i> JobConnect
           </h1>
-          {/* <p className="role-badge">Job Provider</p> */}
         </div>
         
         <nav className="nav-menu">
@@ -678,15 +735,6 @@ const JobProviderDashboard = () => {
         </nav>
         
         <div className="profile-section">
-          {/* <div className="profile-info">
-            <div className="profile-icon">
-              <i className="fas fa-user-tie"></i>
-            </div>
-            <div>
-              <p className="profile-name">Job Provider</p>
-              <p className="profile-email">provider@jobconnect.com</p>
-            </div>
-          </div> */}
           <button 
             onClick={handleLogout} 
             className="logout-button"
