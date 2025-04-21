@@ -27,6 +27,8 @@ import EmployerDashboard from './components/employer/EmployerDashboard'
 import  WorkerDashboard  from './components/worker/WorkerDashboard'
 import AdminDashboard from './components/admin/AdminDashboard'
 import { Login1 } from './components/common/Login1'
+import ForgotPassword from './components/common/ForgotPassword'
+import ResetPassword from './components/common/ResetPassword'
 
 
 function App() {
@@ -44,6 +46,8 @@ function App() {
         <Route path='/about-us'element={<AboutUs/>}></Route> 
         <Route path='/login'element={<Login/>}></Route>
         <Route path='/login1' element={<Login1/>}></Route>
+        <Route path='/forgotpassword' element={<ForgotPassword/>}></Route>
+        <Route path='/resetpassword/:token' element={<ResetPassword/>}></Route>
         <Route path='/signup'element={<Signup/>}></Route>
         <Route path='/adminsignup'element={<AdminSignup/>}></Route>
         <Route path='/employeesignup'element={<EmployeeSignup/>}></Route>

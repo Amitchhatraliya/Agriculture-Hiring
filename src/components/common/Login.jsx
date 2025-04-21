@@ -143,17 +143,17 @@ export const Login = () => {
             {errors.password && <div className="invalid-feedback">{errors.password.message}</div>}
           </div>
 
-          <div className="form-group remember-me">
-            <label>
-              <input type="checkbox" {...register("rememberMe")} /> Remember Me
-            </label>
-          </div>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+  <input type="checkbox" id="remember" style={{ marginRight: '8px' }} />
+  <label htmlFor="remember">Remember Me</label>
+</div>
+
 
           <button type="submit" className="login-button" disabled={isLoading}>
             {isLoading ? <div className="spinner"></div> : 'Login'}
           </button>
 
-          <div className="social-login">
+          {/* <div className="social-login">
             <p>Or login with</p>
             <div className="social-buttons">
               <button type="button" className="google-button">
@@ -163,10 +163,10 @@ export const Login = () => {
                 <FontAwesomeIcon icon={faFacebook} /> Facebook
               </button>
             </div>
-          </div>
+          </div> */}
 
           <div className="forgot-password">
-            <Link to="/forgot-password">Forgot Password?</Link>
+            <Link to="/forgotpassword">Forgot Password?</Link>
           </div>
 
           <div className="signup-link">

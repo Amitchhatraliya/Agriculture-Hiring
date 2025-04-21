@@ -17,8 +17,8 @@ export const WorkerSignup = () => {
       fullName: data.fullname,
       email: data.email,
       password: data.password,
-      location: data.location,
-      availability: data.availability,
+      // location: data.location,
+      // availability: data.availability,
       roleId: "67c660b3b22e1fed7fbf5b7e" // Your role ID for workers
     };
 
@@ -120,7 +120,7 @@ export const WorkerSignup = () => {
             {errors.email && <div className="invalid-feedback">{errors.email.message}</div>}
           </div>
 
-          <div className="form-group">
+          {/* <div className="form-group">
             <label>Location</label>
             <input
               type="text"
@@ -143,7 +143,7 @@ export const WorkerSignup = () => {
               <option value="Seasonal">Seasonal</option>
             </select>
             {errors.availability && <div className="invalid-feedback">{errors.availability.message}</div>}
-          </div>
+          </div> */}
 
           <div className="form-group">
             <label>Password</label>

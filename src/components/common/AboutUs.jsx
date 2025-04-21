@@ -107,7 +107,7 @@ const AboutUs = () => {
         </div>
       </section>
 
-      {/* Partners Section */}
+      {/* Partners Section
       <section className="partners-section">
         <h2>Our Partners</h2>
         <div className="partners-grid">
@@ -124,7 +124,7 @@ const AboutUs = () => {
             <h3>Farmers United</h3>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Values Section */}
       <section className="values-section">

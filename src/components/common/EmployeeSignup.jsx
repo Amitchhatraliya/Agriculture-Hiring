@@ -17,8 +17,8 @@ export const EmployeeSignup = () => {
       const res = await axios.post("/employer/addemployer", {
         fullName: data.fullname,
         email: data.email,
-        companyName: data.companyName,
-        location: data.location,
+        // companyName: data.companyName,
+        // location: data.location,
         password: data.password,
         roleId: "67c65ead46b8bd9b25fcbd03" // Replace with actual employer role ID
       });
@@ -118,7 +118,7 @@ export const EmployeeSignup = () => {
             {errors.email && <div className="invalid-feedback">{errors.email.message}</div>}
           </div>
 
-          <div className="form-group">
+          {/* <div className="form-group">
             <label>Company Name</label>
             <input
               type="text"
@@ -138,7 +138,7 @@ export const EmployeeSignup = () => {
               {...register("location", { required: "Location is required" })}
             />
             {errors.location && <div className="invalid-feedback">{errors.location.message}</div>}
-          </div>
+          </div> */}
 
           <div className="form-group">
             <label>Password</label>
@@ -185,7 +185,7 @@ export const EmployeeSignup = () => {
           </button>
         </form>
         <p className="text-center mt-2">
-          Already have an account? <Link to="/login">Login</Link>
+          Already have an account? <Link to="/login1">Login</Link>
         </p>
       </div>
     </div>
